@@ -13,15 +13,20 @@ class TrackersViewController: UIViewController {
     
     private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        let collectionView = UICollectionView(frame: .zero,
+                                              collectionViewLayout: layout)
         return collectionView
     }()
-    
-    private let letters = [
-                "а", "б", "в", "г", "д", "е", "ё", "ж", "з", "и", "й", "к",
-                "л", "м", "н", "о", "п", "р", "с", "т", "у", "ф", "х", "ц",
-                "ч", "ш" , "щ", "ъ", "ы", "ь", "э", "ю", "я"
-    ]
+
+    private var helper: SupplementaryCollection?
+//    = {
+//        let params = GeometricParams(cellCount: 3,
+//                                     leftInset: 10,
+//                                     rightInset: 10,
+//                                     cellSpacing: 10)
+//        let helper = SupplementaryCollection(using: params, collection: collectionView)
+//        return helper
+//    }()
     
     private let titleLabel: UILabel = {
         let titleLabel = UILabel()
@@ -48,13 +53,47 @@ class TrackersViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        setupUI()
+        collectionView.backgroundColor = .white
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(collectionView)
+        
+        let addButton = UIButton(type: .roundedRect, primaryAction: UIAction(title: "Add color", handler: { [weak self] _ in
+            let colors: [UIColor] = [
+                .black, .blue, .brown,
+                .cyan, .green, .orange,
+                .red, .purple, .yellow
+            ]
+            
+            let selectedColors = (0..<2).map { _ in colors[Int.random(in: 0..<colors.count)] }
+            self?.helper?.add(colors: selectedColors)
+        }))
+        addButton.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(addButton)
+        
+        NSLayoutConstraint.activate([
+            collectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            collectionView.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.7),
+            addButton.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            addButton.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            addButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            addButton.heightAnchor.constraint(equalToConstant: 30)
+        ])
+        
+        let params = GeometricParams(cellCount: 2,
+                                     leftInset: 16,
+                                     rightInset: 16,
+                                     cellSpacing: 9)
+        self.helper = SupplementaryCollection(using: params, collection: collectionView)
+        
+//        setupUI()
     }
 
     private func setupUI() {
-        setupNavigationBar()
-        setupTitleLabel()
-        setupSearchBar()
+//        setupNavigationBar()
+//        setupTitleLabel()
+//        setupSearchBar()
 //        setupStub()
         setupCollectionView()
     }
@@ -73,6 +112,7 @@ class TrackersViewController: UIViewController {
         datePicker.tintColor = .ypBlack
         datePicker.layer.cornerRadius = 8
         datePicker.clipsToBounds = true
+        datePicker.addTarget(self, action: #selector(datePickerValueChanged(_:)), for: .valueChanged)
         navigationItem.rightBarButtonItem =  UIBarButtonItem(customView: datePicker)
     }
     
@@ -107,7 +147,7 @@ class TrackersViewController: UIViewController {
         let stubImageView = UIImageView(image: UIImage(named: .Trackers.starStubImage))
         let stubTextLabel = UILabel()
         stubTextLabel.text = .Labels.stubText
-        stubTextLabel.font = .medium
+        stubTextLabel.font = .medium12
                 
         stubImageView.translatesAutoresizingMaskIntoConstraints = false
         stubTextLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -129,84 +169,31 @@ class TrackersViewController: UIViewController {
     }
     
     private func setupCollectionView() {
-        collectionView.dataSource = self
-        collectionView.delegate = self
-        
-        collectionView.register(TrackerCell.self, forCellWithReuseIdentifier: "cell")
-        collectionView.register(SupplementaryView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "header")
-        
-        collectionView.allowsMultipleSelection = false
-        
-        view.addSubview(collectionView)
-        
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
-        
-        NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 24),
-            collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16)
-        ])
+//        view.addSubview(collectionView)
+//        
+//        collectionView.translatesAutoresizingMaskIntoConstraints = false
+//        
+//        NSLayoutConstraint.activate([
+//            collectionView.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 24),
+//            collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+//            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+//            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16)
+//        ])
+    }
+    
+    func setupAddButton() {
+
     }
     
     @objc private func addTrackerTapped() {
 
     }
     
-    @objc private func datePickerTapped() {
-
-    }
-}
-
-extension TrackersViewController: UICollectionViewDataSource {
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return letters.count
-    }
-        
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as? TrackerCell
-        
-        cell?.titleLabel.text = letters[indexPath.row]
-        return cell!
-    }
-}
-
-extension TrackersViewController: UICollectionViewDelegate {
-    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        var id: String
-        switch kind {
-        case UICollectionView.elementKindSectionHeader:
-            id = "header"
-        default:
-            id = ""
-        }
-        
-        let view = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: id, for: indexPath) as! SupplementaryView // 6
-        view.titleLabel.text = "Здесь находится Supplementary view"
-        return view
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let cell = collectionView.cellForItem(at: indexPath) as? TrackerCell
-        cell?.titleLabel.font = UIFont.boldSystemFont(ofSize: 17)
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
-        let cell = collectionView.cellForItem(at: indexPath) as? TrackerCell
-        cell?.titleLabel.font = UIFont.systemFont(ofSize: 17, weight: .regular)
-    }
-}
-
-extension TrackersViewController: UICollectionViewDelegateFlowLayout {
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        CGSize(width: collectionView.frame.width, height: 55)
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize { // 1
-        return CGSize(width: collectionView.bounds.width / 2, height: 50)
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        return 0
+    @objc func datePickerValueChanged(_ sender: UIDatePicker) {
+        let selectedDate = sender.date
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "dd.MM.yyyy"
+        let formattedDate = dateFormatter.string(from: selectedDate)
+        print("Выбранная дата: \(formattedDate)")
     }
 }
