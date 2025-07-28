@@ -1,13 +1,13 @@
 //
-//  SupplementaryView.swift
+//  TrackersCategoryHeader.swift
 //  Tracker
 //
-//  Created by Amina Khusnutdinova on 05.07.2025.
+//  Created by Amina Khusnutdinova on 12.06.2025.
 //
 
 import UIKit
 
-class SupplementaryView: UICollectionReusableView {
+class TrackersCategoryHeader: UICollectionReusableView {
     static let identifier = "header"
     
     private let titleLabel: UILabel = {
@@ -25,8 +25,9 @@ class SupplementaryView: UICollectionReusableView {
         addSubview(titleLabel)
         
         NSLayoutConstraint.activate([
-            titleLabel.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 28),
-            titleLabel.topAnchor.constraint(equalTo: topAnchor)
+            titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant:  12),
+            titleLabel.topAnchor.constraint(equalTo: topAnchor),
+            titleLabel.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
     }
     

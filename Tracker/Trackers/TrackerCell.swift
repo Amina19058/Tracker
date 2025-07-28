@@ -10,6 +10,15 @@ import UIKit
 class TrackerCell: UICollectionViewCell {
     static let identifier = "cell"
     
+    private var isCompletedToday = false
+    private var onToggleComplete: (() -> Void)?
+    private var color: UIColor?
+    private var daysCount: Int = 0
+    
+    weak var delegate: TrackerCellDelegate?
+    private var tracker: Tracker?
+    
+    
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = .medium12
@@ -29,7 +38,7 @@ class TrackerCell: UICollectionViewCell {
     
     private let emojiBackgroundView: UIView = {
         let backgroundView = UIView()
-        backgroundView.backgroundColor = .ypWhite
+        backgroundView.backgroundColor = .ypWhite.withAlphaComponent(0.3)
         backgroundView.layer.cornerRadius = 12
         backgroundView.translatesAutoresizingMaskIntoConstraints = false
         
@@ -59,30 +68,88 @@ class TrackerCell: UICollectionViewCell {
         button.imageView?.tintColor = .ypWhite
         button.layer.cornerRadius = 17
         button.translatesAutoresizingMaskIntoConstraints = false
+        
+        button.imageView?.contentMode = .center
+        button.contentHorizontalAlignment = .center
+        button.contentVerticalAlignment = .center
+        
+        button.addTarget(self, action: #selector(plusButtonTapped), for: .touchUpInside)
         return button
     }()
-    
+
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
         setupUI()
     }
     
     override func prepareForReuse() {
         super.prepareForReuse()
         titleLabel.text = nil
-        contentView.backgroundColor = nil
+        emojiLabel.text = nil
+        quantityLabel.text = nil
+        cardView.backgroundColor = nil
+        isCompletedToday = false
+        onToggleComplete = nil
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func configure(backgroundColor: UIColor, emoji: String, title: String, daysCount: Int) {
+    func configure(
+        backgroundColor: UIColor,
+        emoji: String,
+        title: String,
+        daysCount: Int,
+        isCompletedToday: Bool,
+        tracker: Tracker)
+    {
+        self.tracker = tracker
+        self.daysCount = daysCount
+        self.isCompletedToday = isCompletedToday
+        self.color = backgroundColor
+        
+        
+        
         cardView.backgroundColor = backgroundColor
         emojiLabel.text = emoji
         titleLabel.text = title
-        quantityLabel.text = "\(daysCount) дней"
+        
+        updateQuantityLabel()
+        setupButton(isCompleted: isCompletedToday)
+    }
+    
+    func increaseDayCount() {
+        daysCount += 1
+        updateQuantityLabel()
+        setupButton(isCompleted: true)
+    }
+
+    func decreaseDayCount() {
+        daysCount -= 1
+        updateQuantityLabel()
+        setupButton(isCompleted: false)
+    }
+    
+    func setupButton(isCompleted: Bool) {
+        isCompletedToday = isCompleted
+        
+        let config = UIImage.SymbolConfiguration(pointSize: 11, weight: .medium)
+        let image = isCompleted ? UIImage(systemName: "checkmark", withConfiguration: config) :
+                                  UIImage(systemName: "plus", withConfiguration: config)
+        plusButton.setImage(image, for: .normal)
+
+        plusButton.tintColor = .ypWhite
+        plusButton.backgroundColor = isCompletedToday ? color?.withAlphaComponent(0.3) : color
+    }
+    
+    @objc private func plusButtonTapped() {
+        guard let tracker else { return }
+        delegate?.didTapTrackerCellButton(for: tracker, in: self)
+    }
+    
+    private func updateQuantityLabel() {
+        quantityLabel.text = "\(daysCount) \(String.pluralizeDay(daysCount))"
     }
     
     private func setupUI() {

@@ -9,9 +9,25 @@ extension String {
     enum Labels {
         static let trackersTitle = "Трекеры"
         static let statisticsTitle = "Статистика"
+        static let createTrackerTitle = "Создание трекера"
         
+        static let newHabbitTitle = "Новая привычка"
+        static let newEventTitle = "Новая привычка"
+
         static let searchFieldPlaceholder = "Поиск"
         static let stubText = "Что будем отслеживать?"
+        
+        static let habbitButtonTitle = "Привычка"
+        static let eventButtonTitle = "Нерегулярное событие"
+        
+        static let nameFieldPlaceholder = "Введите название трекера"
+        static let categoryButtonTitle = "Категория"
+        static let scheduleButtonTitle = "Расписание"
+        static let createButtonTitle = "Создать"
+        static let cancelButtonTitle = "Отмена"
+        
+        static let scheduleTitle = "Расписание"
+        static let doneButtonTitle = "Готово"
     }
             
     enum TabBar {
@@ -33,5 +49,16 @@ extension String {
         static let searchBar = "SearchBar"
         static let stubImage = "StarImage"
         static let stubLabel = "StubLabel"
+    }
+}
+
+
+extension String {
+    static func pluralizeDay(_ count: Int) -> String {
+        switch count % 10 {
+        case 1 where count % 100 != 11: return "день"
+        case 2...4 where !(12...14).contains(count % 100): return "дня"
+        default: return "дней"
+        }
     }
 }
