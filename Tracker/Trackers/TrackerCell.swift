@@ -72,8 +72,6 @@ class TrackerCell: UICollectionViewCell {
         button.imageView?.contentMode = .center
         button.contentHorizontalAlignment = .center
         button.contentVerticalAlignment = .center
-        
-        button.addTarget(self, action: #selector(plusButtonTapped), for: .touchUpInside)
         return button
     }()
 
@@ -162,6 +160,8 @@ class TrackerCell: UICollectionViewCell {
         
         contentView.addSubview(quantityLabel)
         contentView.addSubview(plusButton)
+        
+        plusButton.addTarget(self, action: #selector(plusButtonTapped), for: .touchUpInside)
 
         NSLayoutConstraint.activate([
             cardView.topAnchor.constraint(equalTo: contentView.topAnchor),

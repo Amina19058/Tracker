@@ -11,13 +11,13 @@ extension String {
         static let statisticsTitle = "Статистика"
         static let createTrackerTitle = "Создание трекера"
         
-        static let newHabbitTitle = "Новая привычка"
-        static let newEventTitle = "Новая привычка"
+        static let newHabitTitle = "Новая привычка"
+        static let newEventTitle = "Новое нерегулярное событие"
 
         static let searchFieldPlaceholder = "Поиск"
         static let stubText = "Что будем отслеживать?"
         
-        static let habbitButtonTitle = "Привычка"
+        static let habitButtonTitle = "Привычка"
         static let eventButtonTitle = "Нерегулярное событие"
         
         static let nameFieldPlaceholder = "Введите название трекера"

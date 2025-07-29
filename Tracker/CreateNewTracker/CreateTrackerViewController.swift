@@ -16,9 +16,9 @@ final class CreateTrackerViewController: UIViewController {
         return label
     }()
 
-    private let habbitButton: UIButton = {
+    private let habitButton: UIButton = {
         let button = UIButton()
-        button.setTitle(.Labels.habbitButtonTitle, for: .normal)
+        button.setTitle(.Labels.habitButtonTitle, for: .normal)
         return button
     }()
 
@@ -38,7 +38,7 @@ final class CreateTrackerViewController: UIViewController {
     private func setupUI() {
         view.addSubview(titleLabel)
         
-        [habbitButton, eventButton].forEach {
+        [habitButton, eventButton].forEach {
             $0.titleLabel?.font = .medium16
             $0.titleLabel?.textColor = .ypWhite
             $0.backgroundColor = .ypBlack
@@ -47,27 +47,27 @@ final class CreateTrackerViewController: UIViewController {
             view.addSubview($0)
         }
         
-        habbitButton.addTarget(self, action: #selector(createHabbit), for: .touchUpInside)
+        habitButton.addTarget(self, action: #selector(createHabit), for: .touchUpInside)
         eventButton.addTarget(self, action: #selector(createEvent), for: .touchUpInside)
 
         NSLayoutConstraint.activate([
             titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 24),
             titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
 
-            habbitButton.heightAnchor.constraint(equalToConstant: 60),
-            habbitButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
-            habbitButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
-            habbitButton.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            habitButton.heightAnchor.constraint(equalToConstant: 60),
+            habitButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
+            habitButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
+            habitButton.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             
             eventButton.heightAnchor.constraint(equalToConstant: 60),
-            eventButton.topAnchor.constraint(equalTo: habbitButton.bottomAnchor, constant: 16),
-            eventButton.leadingAnchor.constraint(equalTo: habbitButton.leadingAnchor),
-            eventButton.trailingAnchor.constraint(equalTo: habbitButton.trailingAnchor)
+            eventButton.topAnchor.constraint(equalTo: habitButton.bottomAnchor, constant: 16),
+            eventButton.leadingAnchor.constraint(equalTo: habitButton.leadingAnchor),
+            eventButton.trailingAnchor.constraint(equalTo: habitButton.trailingAnchor)
         ])
     }
 
-    @objc private func createHabbit() {
-        let habbitVC = NewTrackerViewController(type: .habbit, createTrackerDelegate: self.delegate)
+    @objc private func createHabit() {
+        let habbitVC = NewTrackerViewController(type: .habit, createTrackerDelegate: self.delegate)
         self.navigationController?.pushViewController(habbitVC, animated: true)
     }
 

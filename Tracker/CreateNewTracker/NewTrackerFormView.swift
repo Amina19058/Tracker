@@ -6,7 +6,7 @@
 //
 
 enum TrackerType {
-    case habbit
+    case habit
     case event
 }
 
@@ -92,7 +92,7 @@ final class NewTrackerFormView: UIView {
         let categoryTitle: String = ParameterCellType.category.rawValue
         let scheduleTitle: String = ParameterCellType.schedule.rawValue
         
-        return type == .habbit ? [categoryTitle, scheduleTitle] : [categoryTitle]
+        return type == .habit ? [categoryTitle, scheduleTitle] : [categoryTitle]
     }
     
     init(type: TrackerType) {
@@ -169,7 +169,7 @@ extension NewTrackerFormView: UITableViewDelegate, UITableViewDataSource {
         cell.prepareForReuse()
         
         let title = tableItems[indexPath.row]
-        var value: String? = nil
+        var value: String?
 
         if title == ParameterCellType.schedule.rawValue {
             value = formattedSchedule(from: selectedDays)
@@ -237,12 +237,7 @@ extension NewTrackerFormView: UITextFieldDelegate {
         trackerName = updatedText
         onFormChanged?()
         
-        if updatedText.count > maxCharacterLimit {
-            errorLabel.isHidden = false
-            return false
-        } else {
-            errorLabel.isHidden = true
-            return true
-        }
+        errorLabel.isHidden = updatedText.count <= maxCharacterLimit
+        return errorLabel.isHidden
     }
 }

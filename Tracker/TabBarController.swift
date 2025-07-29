@@ -8,28 +8,23 @@
 import UIKit
 
 
-class TabBarController: UITabBarController, UITabBarControllerDelegate {
+final class TabBarController: UITabBarController, UITabBarControllerDelegate {
     private let tabBarStrings = String.TabBar.self
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.delegate = self
+        delegate = self
         
-        self.tabBar.tintColor = .ypBlue
-        self.tabBar.backgroundColor = .ypWhite
-        self.tabBar.unselectedItemTintColor = .ypGray
+        tabBar.tintColor = .ypBlue
+        tabBar.backgroundColor = .ypWhite
+        tabBar.unselectedItemTintColor = .ypGray
         
-        self.tabBar.layer.borderWidth = 0.5
-        self.tabBar.layer.borderColor = UIColor.ypGray.cgColor
-        self.tabBar.clipsToBounds = true
+        tabBar.layer.borderWidth = 0.5
+        tabBar.layer.borderColor = UIColor.ypGray.cgColor
+        tabBar.clipsToBounds = true
         
         setupTabs()
-    }
-    
-    // UITabBarControllerDelegate method
-    func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
-        print("Selected \(viewController.title!)")
     }
     
     private func setupTabs() {

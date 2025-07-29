@@ -76,8 +76,16 @@ final class SupplementaryCollection: NSObject {
         guard let currentWeekDay = WeekDay.from(date: date) else { return }
 
         let updatedCategories = allCategories.map { category in
-            let visibleTrackers = category.trackers.filter {
-                $0.schedule.contains(currentWeekDay)
+            let visibleTrackers = category.trackers.filter { tracker in
+                let isCompletedToday = completedTrackers.contains {
+                    $0.trackerId == tracker.id && Calendar.current.isDate($0.date, inSameDayAs: date)
+                }
+
+                if tracker.schedule.isEmpty {
+                    return !completedTrackers.contains { $0.trackerId == tracker.id } || isCompletedToday
+                } else {
+                    return tracker.schedule.contains(currentWeekDay)
+                }
             }
             return TrackerCategory(title: category.title, trackers: visibleTrackers)
         }.filter { !$0.trackers.isEmpty }
@@ -127,29 +135,6 @@ extension SupplementaryCollection: UICollectionViewDataSource {
         )
 
         return cell
-    }
-    
-    private func handleTrackerTap(_ tracker: Tracker) {
-        guard Calendar.current.startOfDay(for: currentDate) <= Calendar.current.startOfDay(for: Date()) else {
-            return
-        }
-
-        if let index = completedTrackers.firstIndex(where: {
-            $0.trackerId == tracker.id &&
-            Calendar.current.isDate($0.date, inSameDayAs: currentDate)
-        }) {
-            completedTrackers.remove(at: index)
-        } else {
-            completedTrackers.append(TrackerRecord(trackerId: tracker.id, date: currentDate))
-        }
-
-        for (sectionIndex, category) in categories.enumerated() {
-            if let itemIndex = category.trackers.firstIndex(where: { $0.id == tracker.id }) {
-                let indexPath = IndexPath(item: itemIndex, section: sectionIndex)
-                collection.reloadItems(at: [indexPath])
-                break
-            }
-        }
     }
 }
 

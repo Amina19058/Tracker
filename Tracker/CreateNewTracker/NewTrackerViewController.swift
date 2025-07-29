@@ -57,7 +57,7 @@ final class NewTrackerViewController: UIViewController {
         formView.delegate = self
         
         view.backgroundColor = .ypWhite
-        navigationItem.title = type == .event ? .Labels.newEventTitle : .Labels.newHabbitTitle
+        navigationItem.title = type == .event ? .Labels.newEventTitle : .Labels.newHabitTitle
         navigationItem.hidesBackButton = true
         
         setupUI()
@@ -97,6 +97,7 @@ final class NewTrackerViewController: UIViewController {
         let name = formView.trackerName
 
         let schedule = formView.selectedSchedule
+        
         let tracker = Tracker(
             id: UUID(),
             title: name,

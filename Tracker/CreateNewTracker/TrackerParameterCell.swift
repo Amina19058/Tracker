@@ -25,7 +25,7 @@ final class TrackerParameterCell: UITableViewCell {
     }()
 
     private let arrowImageView: UIImageView = {
-        let imageView = UIImageView(image: UIImage(named: "chevron_right"))
+        let imageView = UIImageView(image: UIImage(resource: .chevronRight))
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
