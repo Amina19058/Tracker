@@ -7,11 +7,10 @@
 
 import UIKit
 
-class TrackerCell: UICollectionViewCell {
+final class TrackerCell: UICollectionViewCell {
     static let identifier = "cell"
     
     private var isCompletedToday = false
-    private var onToggleComplete: (() -> Void)?
     private var color: UIColor?
     private var daysCount: Int = 0
     
@@ -87,7 +86,6 @@ class TrackerCell: UICollectionViewCell {
         quantityLabel.text = nil
         cardView.backgroundColor = nil
         isCompletedToday = false
-        onToggleComplete = nil
     }
     
     required init?(coder: NSCoder) {
@@ -106,8 +104,6 @@ class TrackerCell: UICollectionViewCell {
         self.daysCount = daysCount
         self.isCompletedToday = isCompletedToday
         self.color = backgroundColor
-        
-        
         
         cardView.backgroundColor = backgroundColor
         emojiLabel.text = emoji
