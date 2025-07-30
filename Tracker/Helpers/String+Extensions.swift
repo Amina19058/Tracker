@@ -1,0 +1,64 @@
+//
+//  String+Extensions.swift
+//  Tracker
+//
+//  Created by Amina Khusnutdinova on 27.05.2025.
+//
+
+extension String {
+    enum Labels {
+        static let trackersTitle = "Трекеры"
+        static let statisticsTitle = "Статистика"
+        static let createTrackerTitle = "Создание трекера"
+        
+        static let newHabitTitle = "Новая привычка"
+        static let newEventTitle = "Новое нерегулярное событие"
+
+        static let searchFieldPlaceholder = "Поиск"
+        static let stubText = "Что будем отслеживать?"
+        
+        static let habitButtonTitle = "Привычка"
+        static let eventButtonTitle = "Нерегулярное событие"
+        
+        static let nameFieldPlaceholder = "Введите название трекера"
+        static let categoryButtonTitle = "Категория"
+        static let scheduleButtonTitle = "Расписание"
+        static let createButtonTitle = "Создать"
+        static let cancelButtonTitle = "Отмена"
+        
+        static let scheduleTitle = "Расписание"
+        static let doneButtonTitle = "Готово"
+    }
+            
+    enum TabBar {
+        static let trackersTitle = String.Labels.trackersTitle
+        static let trackersOnImage = "trackers_bar_on"
+        static let trackersOffImage = "trackers_bar_off"
+        
+        static let statisticsTitle = String.Labels.statisticsTitle
+        static let statisticsOnImage = "statistics_bar_on"
+        static let statisticsOffImage = "statistics_bar_off"
+    }
+    
+    enum Trackers {
+        static let starStubImage = "star_stub"
+    }
+    
+    enum AccessibilityIdentifiers {
+        static let trackersTitleLabel = "TrackersTitleLabel"
+        static let searchBar = "SearchBar"
+        static let stubImage = "StarImage"
+        static let stubLabel = "StubLabel"
+    }
+}
+
+
+extension String {
+    static func pluralizeDay(_ count: Int) -> String {
+        switch count % 10 {
+        case 1 where count % 100 != 11: return "день"
+        case 2...4 where !(12...14).contains(count % 100): return "дня"
+        default: return "дней"
+        }
+    }
+}
