@@ -95,14 +95,18 @@ final class NewTrackerViewController: UIViewController {
     
     @objc private func createTapped() {
         let name = formView.trackerName
-
         let schedule = formView.selectedSchedule
+        
+        guard
+            let emoji = formView.selectedEmoji,
+            let color = formView.selectedColor
+        else { return }
         
         let tracker = Tracker(
             id: UUID(),
             title: name,
-            color: .blue,
-            emoji: "🏃‍♀️",
+            color: color,
+            emoji: emoji,
             schedule: schedule
         )
 

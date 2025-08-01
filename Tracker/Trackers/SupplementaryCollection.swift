@@ -47,9 +47,9 @@ final class SupplementaryCollection: NSObject {
         collection.allowsMultipleSelection = false
         
         collection.register(TrackerCell.self, forCellWithReuseIdentifier: TrackerCell.identifier)
-        collection.register(TrackersCategoryHeader.self,
+        collection.register(CollectionHeader.self,
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
-                                withReuseIdentifier: TrackersCategoryHeader.identifier)
+                                withReuseIdentifier: CollectionHeader.identifier)
         
         collection.delegate = self
         collection.dataSource = self
@@ -144,13 +144,13 @@ extension SupplementaryCollection: UICollectionViewDelegate {
         var id: String
         switch kind {
         case UICollectionView.elementKindSectionHeader:
-            id = TrackersCategoryHeader.identifier
+            id = CollectionHeader.identifier
         default:
             id = ""
         }
         
         guard let view = collectionView.dequeueReusableSupplementaryView(ofKind: kind,
-                                                                         withReuseIdentifier: id, for: indexPath) as? TrackersCategoryHeader else {
+                                                                         withReuseIdentifier: id, for: indexPath) as? CollectionHeader else {
             return UICollectionReusableView()
         }
         
