@@ -7,7 +7,7 @@
 
 import UIKit
 
-class TrackersViewController: UIViewController {
+final class TrackersViewController: UIViewController {
     private var selectedDate: Date = Date()
     
     private let collectionView: UICollectionView = {
@@ -45,7 +45,6 @@ class TrackersViewController: UIViewController {
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
-    
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -159,6 +158,8 @@ class TrackersViewController: UIViewController {
                                      cellSpacing: 9)
         self.helper = SupplementaryCollection(using: params, collection: collectionView)
         self.helper?.delegate = self
+        
+        helper?.updateVisibleTrackers(for: selectedDate)
     }
     
     private func updateStubVisibility() {
@@ -184,10 +185,21 @@ class TrackersViewController: UIViewController {
 
 extension TrackersViewController: CreateTrackerViewControllerDelegate {
     func onCreateTracker(tracker: Tracker, categoryTitle: String) {
-        helper?.add(tracker: tracker, to: categoryTitle)
+        let storage = DataStoreManager.shared
+        
+        let categoryCoreData = storage.categoryStore.coreDataCategory(with: categoryTitle)
+            ?? {
+                try? storage.categoryStore.addNewCategory(with: categoryTitle)
+                return storage.categoryStore.coreDataCategory(with: categoryTitle)
+            }()!
+
+        try? storage.trackerStore.addNewTracker(tracker, to: categoryCoreData)
+        
         updateStubVisibility()
         
         dismiss(animated: true, completion: nil)
+        
+        
     }
 }
 

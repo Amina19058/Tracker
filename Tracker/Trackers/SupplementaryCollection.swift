@@ -26,14 +26,15 @@ struct GeometricParams {
 final class SupplementaryCollection: NSObject {
     weak var delegate: SupplementaryCollectionDelegate?
     
-    private var allCategories: [TrackerCategory] = []
     private var categories = [TrackerCategory]()
-    private var completedTrackers: [TrackerRecord] = []
 
     private var currentDate: Date = Date()
     
     private let params: GeometricParams
     private let collection: UICollectionView
+    
+    private let categoryStore: TrackerCategoryStore = DataStoreManager.shared.categoryStore
+    private let recordStore: TrackerRecordStore = DataStoreManager.shared.recordStore
     
     var isEmpty: Bool {
         return categories.allSatisfy { $0.trackers.isEmpty }
@@ -44,6 +45,8 @@ final class SupplementaryCollection: NSObject {
         self.collection = collection
             
         super.init()
+        categoryStore.delegate = self
+        recordStore.delegate = self
         collection.allowsMultipleSelection = false
         
         collection.register(TrackerCell.self, forCellWithReuseIdentifier: TrackerCell.identifier)
@@ -57,32 +60,20 @@ final class SupplementaryCollection: NSObject {
         collection.reloadData()
     }
     
-    func add(tracker: Tracker, to categoryTitle: String) {
-        if let category = allCategories.first(where: { $0.title == categoryTitle }) {
-            var trackers = category.trackers
-            trackers.append(tracker)
-            
-            allCategories = allCategories.filter { $0.title != categoryTitle }
-            allCategories.append(TrackerCategory(title: categoryTitle, trackers: trackers))
-        } else {
-            allCategories.append(TrackerCategory(title: categoryTitle, trackers: [tracker]))
-        }
-        
-        updateVisibleTrackers(for: currentDate)
-    }
-    
     func updateVisibleTrackers(for date: Date) {
         currentDate = date
         guard let currentWeekDay = WeekDay.from(date: date) else { return }
 
-        let updatedCategories = allCategories.map { category in
+        let completed = recordStore.records
+        
+        let updatedCategories = categoryStore.categories.map { category in
             let visibleTrackers = category.trackers.filter { tracker in
-                let isCompletedToday = completedTrackers.contains {
+                let isCompletedToday = completed.contains {
                     $0.trackerId == tracker.id && Calendar.current.isDate($0.date, inSameDayAs: date)
                 }
 
                 if tracker.schedule.isEmpty {
-                    return !completedTrackers.contains { $0.trackerId == tracker.id } || isCompletedToday
+                    return !completed.contains { $0.trackerId == tracker.id } || isCompletedToday
                 } else {
                     return tracker.schedule.contains(currentWeekDay)
                 }
@@ -92,6 +83,8 @@ final class SupplementaryCollection: NSObject {
 
         self.categories = updatedCategories
         collection.reloadData()
+        print("Fetched completed records:", recordStore.records.map { "\($0.trackerId) - \($0.date)" })
+
         delegate?.didUpdateTrackers(isEmpty: isEmpty)
     }
 }
@@ -118,11 +111,13 @@ extension SupplementaryCollection: UICollectionViewDataSource {
         cell.prepareForReuse()
         
         let tracker = categories[indexPath.section].trackers[indexPath.row]
-        let isCompleted = completedTrackers.contains {
+        let completed = recordStore.records
+        
+        let isCompleted = completed.contains {
             $0.trackerId == tracker.id && Calendar.current.isDate($0.date, inSameDayAs: currentDate)
         }
 
-        let daysCount = completedTrackers.filter { $0.trackerId == tracker.id }.count
+        let daysCount = completed.filter { $0.trackerId == tracker.id }.count
 
         cell.delegate = self
         cell.configure(
@@ -186,15 +181,31 @@ extension SupplementaryCollection: TrackerCellDelegate {
         guard Calendar.current.startOfDay(for: currentDate) <= Calendar.current.startOfDay(for: Date()) else {
             return
         }
+        
+        let record = TrackerRecord(trackerId: tracker.id, date: currentDate)
 
-        if let index = completedTrackers.firstIndex(where: {
+        let isCompleted = recordStore.records.contains {
             $0.trackerId == tracker.id && Calendar.current.isDate($0.date, inSameDayAs: currentDate)
-        }) {
-            completedTrackers.remove(at: index)
-            cell.decreaseDayCount()
-        } else {
-            completedTrackers.append(TrackerRecord(trackerId: tracker.id, date: currentDate))
-            cell.increaseDayCount()
         }
+
+        if isCompleted {
+            try? recordStore.removeRecord(record)
+        } else {
+            recordStore.addNewRecord(record)
+        }
+        
+        collection.reloadData()
+    }
+}
+
+extension SupplementaryCollection: CategoryStoreDelegate {
+    func storeDidUpdateCategories() {
+        updateVisibleTrackers(for: currentDate)
+    }
+}
+
+extension SupplementaryCollection: RecordStoreDelegate {
+    func storeDidUpdateRecords() {
+        updateVisibleTrackers(for: currentDate)
     }
 }

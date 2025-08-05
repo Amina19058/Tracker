@@ -5,6 +5,8 @@
 //  Created by Amina Khusnutdinova on 10.07.2025.
 //
 
+import UIKit
+
 enum TrackerType {
     case habit
     case event
@@ -19,8 +21,6 @@ enum PickerItem: Int, CaseIterable {
     case emoji = 0
     case color
 }
-
-import UIKit
 
 final class NewTrackerFormView: UIView {
     private let type: TrackerType
@@ -409,7 +409,7 @@ extension NewTrackerFormView: UICollectionViewDataSource, UICollectionViewDelega
         case PickerItem.emoji.rawValue:
             selectedEmoji = emojis[indexPath.item]
         case PickerItem.color.rawValue:
-            selectedColor = colors[indexPath.item]
+           selectedColor = colors[indexPath.item]
         default:
             break
         }
@@ -417,6 +417,14 @@ extension NewTrackerFormView: UICollectionViewDataSource, UICollectionViewDelega
     }
 
     func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
-
+        switch indexPath.section {
+        case PickerItem.emoji.rawValue:
+            selectedEmoji = nil
+        case PickerItem.color.rawValue:
+            selectedColor = nil
+        default:
+            break
+        }
+        onFormChanged?()
     }
 }
