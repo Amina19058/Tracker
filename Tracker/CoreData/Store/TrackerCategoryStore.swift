@@ -15,21 +15,50 @@ enum TrackerCategoryStoreError: Error {
     case decodingErrorInvalidTitle
 }
 
-final class TrackerCategoryStore: NSObject {
+final class TrackerCategoryStore: NSObject {    
     weak var delegate: CategoryStoreDelegate?
     
     private let context: NSManagedObjectContext
-    private var fetchedResultsController: NSFetchedResultsController<TrackerCategoryCoreData>?
     private let trackerStore: TrackerStore
+    private var fetchedResultsController: NSFetchedResultsController<TrackerCategoryCoreData>?
     
     init(context: NSManagedObjectContext, trackerStore: TrackerStore) {
         self.context = context
         self.trackerStore = trackerStore
         super.init()
-        
-        let fetchRequest = TrackerCategoryCoreData.fetchRequest()
-        fetchRequest.sortDescriptors = [NSSortDescriptor(keyPath: \TrackerCategoryCoreData.title, ascending: true)]
+        setupFetchedResultsController()
+    }
 
+    var categories: [TrackerCategory] {
+        guard
+            let objects = fetchedResultsController?.fetchedObjects,
+            let categories = try? objects.map({ try category(from: $0) })
+        else {
+            return []
+        }
+        return categories
+    }
+
+    func addNewCategory(with title: String) throws {
+        let categoryCoreData = TrackerCategoryCoreData(context: context)
+        categoryCoreData.title = title
+        categoryCoreData.trackers = NSSet()
+        try context.save()
+    }
+
+    func coreDataCategory(with title: String) -> TrackerCategoryCoreData? {
+        let request: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
+        request.predicate = NSPredicate(format: "title == %@", title)
+        request.fetchLimit = 1
+        return try? context.fetch(request).first
+    }
+
+    private func setupFetchedResultsController() {
+        let fetchRequest = TrackerCategoryCoreData.fetchRequest()
+        fetchRequest.sortDescriptors = [
+            NSSortDescriptor(keyPath: \TrackerCategoryCoreData.title, ascending: true)
+        ]
+        
         let controller = NSFetchedResultsController(
             fetchRequest: fetchRequest,
             managedObjectContext: context,
@@ -41,34 +70,13 @@ final class TrackerCategoryStore: NSObject {
 
         try? controller.performFetch()
     }
-    
-    var categories: [TrackerCategory] {
-        guard
-            let objects = self.fetchedResultsController?.fetchedObjects,
-            let categories = try? objects.map({ try category(from: $0) })
-        else { return [] }
-        return categories
-    }
-    
-    func addNewCategory(with title: String) throws {
-        let trackerCategoryCoreData = TrackerCategoryCoreData(context: context)
-        trackerCategoryCoreData.title = title
-        trackerCategoryCoreData.trackers = NSSet()
-        try context.save()
-    }
-    
-    func coreDataCategory(with title: String) -> TrackerCategoryCoreData? {
-        let fetchRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "title == %@", title)
-        return try? context.fetch(fetchRequest).first
-    }
-    
-    private func category(from categoryCoreData: TrackerCategoryCoreData) throws -> TrackerCategory {
-        guard let title = categoryCoreData.title else {
+
+    private func category(from coreData: TrackerCategoryCoreData) throws -> TrackerCategory {
+        guard let title = coreData.title else {
             throw TrackerCategoryStoreError.decodingErrorInvalidTitle
         }
 
-        let trackers: [Tracker] = (categoryCoreData.trackers as? Set<TrackerCoreData>)?.compactMap {
+        let trackers: [Tracker] = (coreData.trackers as? Set<TrackerCoreData>)?.compactMap {
             try? trackerStore.tracker(from: $0)
         } ?? []
 
