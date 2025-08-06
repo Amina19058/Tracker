@@ -164,7 +164,6 @@ final class NewTrackerFormView: UIView {
         super.layoutSubviews()
         updateCollectionViewHeight()
     }
-
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -178,6 +177,10 @@ final class NewTrackerFormView: UIView {
         
         addSubview(scrollView)
         scrollView.addSubview(contentStackView)
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tapGesture.cancelsTouchesInView = false
+        scrollView.addGestureRecognizer(tapGesture)
         
         stackView.addArrangedSubview(nameTextField)
         stackView.addArrangedSubview(errorLabel)
@@ -235,6 +238,10 @@ final class NewTrackerFormView: UIView {
         collectionView.register(EmojiCell.self, forCellWithReuseIdentifier: EmojiCell.identifier)
         collectionView.register(ColorCell.self, forCellWithReuseIdentifier: ColorCell.identifier)
         collectionView.register(CollectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: CollectionHeader.identifier)
+    }
+    
+    @objc private func dismissKeyboard() {
+        endEditing(true)
     }
 }
 
@@ -320,6 +327,11 @@ extension NewTrackerFormView: UITextFieldDelegate {
         errorLabel.isHidden = updatedText.count <= maxCharacterLimit
         return errorLabel.isHidden
     }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
+    }
 }
 
 extension NewTrackerFormView: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
@@ -387,9 +399,7 @@ extension NewTrackerFormView: UICollectionViewDataSource, UICollectionViewDelega
         return CGSize(width: width / 6, height: width / 6)
     }
 
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        return UIEdgeInsets(top: 24, left: 0, bottom: 40, right: 0)
-    }
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets { UIEdgeInsets(top: 24, left: 0, bottom: 40, right: 0) }
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
         return 0
