@@ -5,7 +5,7 @@
 //  Created by Amina Khusnutdinova on 14.07.2025.
 //
 
-enum WeekDay: String, CaseIterable {
+enum WeekDay: String, CaseIterable, Codable {
     case monday = "Понедельник"
     case tuesday = "Вторник"
     case wednesday = "Среда"

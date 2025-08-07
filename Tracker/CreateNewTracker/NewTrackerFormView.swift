@@ -5,6 +5,8 @@
 //  Created by Amina Khusnutdinova on 10.07.2025.
 //
 
+import UIKit
+
 enum TrackerType {
     case habit
     case event
@@ -15,7 +17,10 @@ enum ParameterCellType: String, CaseIterable {
     case schedule = "Расписание"
 }
 
-import UIKit
+enum PickerItem: Int, CaseIterable {
+    case emoji = 0
+    case color
+}
 
 final class NewTrackerFormView: UIView {
     private let type: TrackerType
@@ -34,7 +39,10 @@ final class NewTrackerFormView: UIView {
     var isFormValid: Bool {
         let isNameValid = !(trackerName.isEmpty) && (trackerName.count <= maxCharacterLimit)
         let isScheduleValid = type == .event || !selectedSchedule.isEmpty
-        return isNameValid && isScheduleValid
+        let isEmojiSelected = selectedEmoji != nil
+        let isColorSelected = selectedColor != nil
+        
+        return isNameValid && isScheduleValid && isEmojiSelected && isColorSelected
     }
     
     var trackerName: String = ""
@@ -42,6 +50,23 @@ final class NewTrackerFormView: UIView {
     var selectedSchedule: [WeekDay] {
         selectedDays
     }
+    
+    var selectedEmoji: String?
+    var selectedColor: UIColor?
+    
+    private let scrollView: UIScrollView = {
+        let scroll = UIScrollView()
+        scroll.translatesAutoresizingMaskIntoConstraints = false
+        return scroll
+    }()
+
+    private let contentStackView: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .vertical
+        stack.spacing = 24
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        return stack
+    }()
     
     private let stackView: UIStackView = {
         let stack = UIStackView()
@@ -87,13 +112,39 @@ final class NewTrackerFormView: UIView {
     }()
     
     private var tableViewHeightConstraint: NSLayoutConstraint!
-    
+    private var collectionViewHeightConstraint: NSLayoutConstraint!
+
     private var tableItems: [String] {
         let categoryTitle: String = ParameterCellType.category.rawValue
         let scheduleTitle: String = ParameterCellType.schedule.rawValue
         
         return type == .habit ? [categoryTitle, scheduleTitle] : [categoryTitle]
     }
+    
+    let collectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.isScrollEnabled = false
+        collectionView.backgroundColor = .clear
+        collectionView.allowsMultipleSelection = true
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        return collectionView
+    }()
+    
+    private let emojis = [
+        "🙂", "😻", "🌺", "🐶", "❤️", "😱",
+        "😇", "😡", "🥶", "🤔", "🙌", "🍔",
+        "🥦", "🏓", "🥇", "🎸", "🏝", "😪",
+    ]
+    
+    private let colors: [UIColor] = [
+        .selection1, .selection2, .selection3,
+        .selection4, .selection5, .selection6,
+        .selection7, .selection8, .selection9,
+        .selection10, .selection11, .selection12,
+        .selection13, .selection14, .selection15,
+        .selection16, .selection17, .selection18
+    ]
     
     init(type: TrackerType) {
         self.type = type
@@ -103,10 +154,15 @@ final class NewTrackerFormView: UIView {
         onFormChanged = { [weak self] in
             self?.delegate?.updateCreateButtonState()
         }
-        
+       
         setupUI()
         setupTableView()
-        updateTableHeight()
+        setupCollectionView()
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        updateCollectionViewHeight()
     }
     
     required init?(coder: NSCoder) {
@@ -116,43 +172,76 @@ final class NewTrackerFormView: UIView {
     private func setupUI() {        
         backgroundColor = .ypWhite
         
-        addSubview(stackView)
-        addSubview(tableView)
-        
         nameTextField.delegate = self
         nameTextField.addTarget(self, action: #selector(trackerNameChanged), for: .editingChanged)
+        
+        addSubview(scrollView)
+        scrollView.addSubview(contentStackView)
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tapGesture.cancelsTouchesInView = false
+        scrollView.addGestureRecognizer(tapGesture)
         
         stackView.addArrangedSubview(nameTextField)
         stackView.addArrangedSubview(errorLabel)
         
+        contentStackView.addArrangedSubview(stackView)
+        contentStackView.addArrangedSubview(tableView)
+        contentStackView.addArrangedSubview(collectionView)
+        
         NSLayoutConstraint.activate([
-            stackView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 24),
-            stackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
-            stackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
-            
-            tableView.topAnchor.constraint(equalTo: stackView.bottomAnchor, constant: 24),
-            tableView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
-            tableView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16)
+            scrollView.topAnchor.constraint(equalTo: topAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
+            scrollView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
+            scrollView.bottomAnchor.constraint(equalTo: bottomAnchor),
+
+            contentStackView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 24),
+            contentStackView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+            contentStackView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+            contentStackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+            contentStackView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
         ])
         
         tableViewHeightConstraint = tableView.heightAnchor.constraint(equalToConstant: 0)
         tableViewHeightConstraint.isActive = true
+        collectionViewHeightConstraint = collectionView.heightAnchor.constraint(equalToConstant: 0)
+        collectionViewHeightConstraint.isActive = true
     }
     
     private func setupTableView() {
         tableView.delegate = self
         tableView.dataSource = self
         tableView.register(TrackerParameterCell.self, forCellReuseIdentifier: TrackerParameterCell.identifier)
+        
+        updateTableHeight()
     }
     
     private func updateTableHeight() {
-       let rowHeight: CGFloat = 75
-       tableViewHeightConstraint.constant = CGFloat(tableItems.count) * rowHeight
-   }
+        let rowHeight: CGFloat = 75
+        tableViewHeightConstraint.constant = CGFloat(tableItems.count) * rowHeight
+    }
+    
+    private func updateCollectionViewHeight() {
+        collectionView.layoutIfNeeded()
+        collectionViewHeightConstraint.constant = collectionView.collectionViewLayout.collectionViewContentSize.height
+    }
     
     @objc private func trackerNameChanged(_ textField: UITextField) {
         trackerName = textField.text ?? ""
         onFormChanged?()
+    }
+    
+    private func setupCollectionView() {
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        
+        collectionView.register(EmojiCell.self, forCellWithReuseIdentifier: EmojiCell.identifier)
+        collectionView.register(ColorCell.self, forCellWithReuseIdentifier: ColorCell.identifier)
+        collectionView.register(CollectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: CollectionHeader.identifier)
+    }
+    
+    @objc private func dismissKeyboard() {
+        endEditing(true)
     }
 }
 
@@ -206,8 +295,6 @@ extension NewTrackerFormView: UITableViewDelegate, UITableViewDataSource {
     }
 }
 
-
-
 extension NewTrackerFormView: ScheduleViewControllerDelegate {
     func didSelectDays(_ selectedDays: [WeekDay]) {
         self.selectedDays = selectedDays
@@ -239,5 +326,115 @@ extension NewTrackerFormView: UITextFieldDelegate {
         
         errorLabel.isHidden = updatedText.count <= maxCharacterLimit
         return errorLabel.isHidden
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
+    }
+}
+
+extension NewTrackerFormView: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return PickerItem.allCases.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        switch section {
+        case PickerItem.emoji.rawValue:
+            return emojis.count
+        case PickerItem.color.rawValue:
+            return colors.count
+        default:
+            return 0
+        }
+    }
+
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        switch indexPath.section {
+        case PickerItem.emoji.rawValue:
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: EmojiCell.identifier, for: indexPath) as! EmojiCell
+            cell.configure(with: emojis[indexPath.item])
+            return cell
+            
+        case PickerItem.color.rawValue:
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ColorCell.identifier, for: indexPath) as! ColorCell
+            cell.configure(with: colors[indexPath.item])
+            return cell
+            
+        default:
+            return UICollectionViewCell()
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        var id: String
+        switch kind {
+        case UICollectionView.elementKindSectionHeader:
+            id = CollectionHeader.identifier
+        default:
+            id = ""
+        }
+        
+        guard let view = collectionView.dequeueReusableSupplementaryView(ofKind: kind,
+                                                                         withReuseIdentifier: id, for: indexPath) as? CollectionHeader else {
+            return UICollectionReusableView()
+        }
+        
+        if indexPath.section == PickerItem.emoji.rawValue {
+            view.configure(title: "Emoji")
+        } else if indexPath.section == PickerItem.color.rawValue {
+            view.configure(title: "Цвет")
+        }
+        
+        return view
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        CGSize(width: collectionView.frame.width, height: 18)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let width = collectionView.frame.width - 18 * 2
+        return CGSize(width: width / 6, height: width / 6)
+    }
+
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets { UIEdgeInsets(top: 24, left: 0, bottom: 40, right: 0) }
+
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return 0
+    }
+
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return 0
+    }
+
+    func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
+        collectionView.indexPathsForSelectedItems?.filter({ $0.section == indexPath.section }).forEach({ collectionView.deselectItem(at: $0, animated: false) })
+        return true
+    }
+
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        switch indexPath.section {
+        case PickerItem.emoji.rawValue:
+            selectedEmoji = emojis[indexPath.item]
+        case PickerItem.color.rawValue:
+           selectedColor = colors[indexPath.item]
+        default:
+            break
+        }
+        onFormChanged?()
+    }
+
+    func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
+        switch indexPath.section {
+        case PickerItem.emoji.rawValue:
+            selectedEmoji = nil
+        case PickerItem.color.rawValue:
+            selectedColor = nil
+        default:
+            break
+        }
+        onFormChanged?()
     }
 }

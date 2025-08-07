@@ -26,14 +26,15 @@ struct GeometricParams {
 final class SupplementaryCollection: NSObject {
     weak var delegate: SupplementaryCollectionDelegate?
     
-    private var allCategories: [TrackerCategory] = []
     private var categories = [TrackerCategory]()
-    private var completedTrackers: [TrackerRecord] = []
 
     private var currentDate: Date = Date()
     
     private let params: GeometricParams
     private let collection: UICollectionView
+    
+    private let categoryStore: TrackerCategoryStore = DataStoreManager.shared.categoryStore
+    private let recordStore: TrackerRecordStore = DataStoreManager.shared.recordStore
     
     var isEmpty: Bool {
         return categories.allSatisfy { $0.trackers.isEmpty }
@@ -42,47 +43,42 @@ final class SupplementaryCollection: NSObject {
     init(using params: GeometricParams, collection: UICollectionView) {
         self.params = params
         self.collection = collection
-            
         super.init()
+        
+        configureStores()
+        configureCollectionView()
+    }
+
+    private func configureStores() {
+        categoryStore.delegate = self
+        recordStore.delegate = self
+    }
+
+    private func configureCollectionView() {
         collection.allowsMultipleSelection = false
-        
         collection.register(TrackerCell.self, forCellWithReuseIdentifier: TrackerCell.identifier)
-        collection.register(TrackersCategoryHeader.self,
-                                forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
-                                withReuseIdentifier: TrackersCategoryHeader.identifier)
-        
+        collection.register(CollectionHeader.self,
+                            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+                            withReuseIdentifier: CollectionHeader.identifier)
         collection.delegate = self
         collection.dataSource = self
-            
         collection.reloadData()
     }
-    
-    func add(tracker: Tracker, to categoryTitle: String) {
-        if let category = allCategories.first(where: { $0.title == categoryTitle }) {
-            var trackers = category.trackers
-            trackers.append(tracker)
-            
-            allCategories = allCategories.filter { $0.title != categoryTitle }
-            allCategories.append(TrackerCategory(title: categoryTitle, trackers: trackers))
-        } else {
-            allCategories.append(TrackerCategory(title: categoryTitle, trackers: [tracker]))
-        }
-        
-        updateVisibleTrackers(for: currentDate)
-    }
-    
+
     func updateVisibleTrackers(for date: Date) {
         currentDate = date
         guard let currentWeekDay = WeekDay.from(date: date) else { return }
 
-        let updatedCategories = allCategories.map { category in
+        let completed = recordStore.records
+        
+        categories = categoryStore.categories.map { category in
             let visibleTrackers = category.trackers.filter { tracker in
-                let isCompletedToday = completedTrackers.contains {
-                    $0.trackerId == tracker.id && Calendar.current.isDate($0.date, inSameDayAs: date)
+                let isCompletedToday = completed.contains {
+                    $0.trackerId == tracker.id &&
+                    Calendar.current.isDate($0.date, inSameDayAs: date)
                 }
-
                 if tracker.schedule.isEmpty {
-                    return !completedTrackers.contains { $0.trackerId == tracker.id } || isCompletedToday
+                    return !completed.contains { $0.trackerId == tracker.id } || isCompletedToday
                 } else {
                     return tracker.schedule.contains(currentWeekDay)
                 }
@@ -90,7 +86,6 @@ final class SupplementaryCollection: NSObject {
             return TrackerCategory(title: category.title, trackers: visibleTrackers)
         }.filter { !$0.trackers.isEmpty }
 
-        self.categories = updatedCategories
         collection.reloadData()
         delegate?.didUpdateTrackers(isEmpty: isEmpty)
     }
@@ -99,31 +94,37 @@ final class SupplementaryCollection: NSObject {
 // MARK: - UICollectionViewDataSource
 
 extension SupplementaryCollection: UICollectionViewDataSource {
+    
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return categories.count
+        categories.count
     }
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return categories[section].trackers.count
+        categories[section].trackers.count
     }
-        
+
     func collectionView(_ collectionView: UICollectionView,
                         cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackerCell.identifier,
-                                                            for: indexPath) as? TrackerCell else {
+        guard let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: TrackerCell.identifier,
+            for: indexPath
+        ) as? TrackerCell else {
             return UICollectionViewCell()
         }
         
         cell.prepareForReuse()
         
-        let tracker = categories[indexPath.section].trackers[indexPath.row]
-        let isCompleted = completedTrackers.contains {
-            $0.trackerId == tracker.id && Calendar.current.isDate($0.date, inSameDayAs: currentDate)
+        let tracker = categories[indexPath.section].trackers[indexPath.item]
+        let completed = recordStore.records
+        
+        let isCompleted = completed.contains {
+            $0.trackerId == tracker.id &&
+            Calendar.current.isDate($0.date, inSameDayAs: currentDate)
         }
-
-        let daysCount = completedTrackers.filter { $0.trackerId == tracker.id }.count
-
+        
+        let daysCount = completed.filter { $0.trackerId == tracker.id }.count
+        
         cell.delegate = self
         cell.configure(
             backgroundColor: tracker.color,
@@ -138,63 +139,97 @@ extension SupplementaryCollection: UICollectionViewDataSource {
     }
 }
 
+// MARK: - UICollectionViewDelegate
 
 extension SupplementaryCollection: UICollectionViewDelegate {
-    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        var id: String
-        switch kind {
-        case UICollectionView.elementKindSectionHeader:
-            id = TrackersCategoryHeader.identifier
-        default:
-            id = ""
-        }
+    
+    func collectionView(_ collectionView: UICollectionView,
+                        viewForSupplementaryElementOfKind kind: String,
+                        at indexPath: IndexPath) -> UICollectionReusableView {
         
-        guard let view = collectionView.dequeueReusableSupplementaryView(ofKind: kind,
-                                                                         withReuseIdentifier: id, for: indexPath) as? TrackersCategoryHeader else {
+        guard kind == UICollectionView.elementKindSectionHeader else {
             return UICollectionReusableView()
         }
         
+        guard let headerView = collectionView.dequeueReusableSupplementaryView(
+            ofKind: kind,
+            withReuseIdentifier: CollectionHeader.identifier,
+            for: indexPath
+        ) as? CollectionHeader else {
+            return UICollectionReusableView()
+        }
+
         let title = categories[indexPath.section].title
-        view.configure(title: title)
-        
-        return view
+        headerView.configure(title: title)
+        return headerView
     }
 }
 
 // MARK: - UICollectionViewDelegateFlowLayout
 
 extension SupplementaryCollection: UICollectionViewDelegateFlowLayout {
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+    
+    func collectionView(_ collectionView: UICollectionView,
+                        layout collectionViewLayout: UICollectionViewLayout,
+                        referenceSizeForHeaderInSection section: Int) -> CGSize {
         CGSize(width: collectionView.frame.width, height: 46)
     }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+
+    func collectionView(_ collectionView: UICollectionView,
+                        layout collectionViewLayout: UICollectionViewLayout,
+                        sizeForItemAt indexPath: IndexPath) -> CGSize {
         
         let availableWidth = collectionView.frame.width - params.cellSpacing
-        let cellWidth =  availableWidth / CGFloat(params.cellCount)
-        return CGSize(width: cellWidth,
-                      height: 148)
+        let cellWidth = availableWidth / CGFloat(params.cellCount)
+        return CGSize(width: cellWidth, height: 148)
     }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+
+    func collectionView(_ collectionView: UICollectionView,
+                        layout collectionViewLayout: UICollectionViewLayout,
+                        minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
         params.cellSpacing
     }
 }
 
+// MARK: - TrackerCellDelegate
+
 extension SupplementaryCollection: TrackerCellDelegate {
+    
     func didTapTrackerCellButton(for tracker: Tracker, in cell: TrackerCell) {
-        guard Calendar.current.startOfDay(for: currentDate) <= Calendar.current.startOfDay(for: Date()) else {
-            return
+        let today = Calendar.current.startOfDay(for: Date())
+        let selectedDay = Calendar.current.startOfDay(for: currentDate)
+        
+        guard selectedDay <= today else { return }
+
+        let record = TrackerRecord(trackerId: tracker.id, date: currentDate)
+        
+        let isCompleted = recordStore.records.contains {
+            $0.trackerId == tracker.id &&
+            Calendar.current.isDate($0.date, inSameDayAs: currentDate)
         }
 
-        if let index = completedTrackers.firstIndex(where: {
-            $0.trackerId == tracker.id && Calendar.current.isDate($0.date, inSameDayAs: currentDate)
-        }) {
-            completedTrackers.remove(at: index)
-            cell.decreaseDayCount()
+        if isCompleted {
+            try? recordStore.removeRecord(record)
         } else {
-            completedTrackers.append(TrackerRecord(trackerId: tracker.id, date: currentDate))
-            cell.increaseDayCount()
+            recordStore.addNewRecord(record)
         }
+
+        collection.reloadData()
+    }
+}
+
+// MARK: - CategoryStoreDelegate
+
+extension SupplementaryCollection: CategoryStoreDelegate {
+    func storeDidUpdateCategories() {
+        updateVisibleTrackers(for: currentDate)
+    }
+}
+
+// MARK: - RecordStoreDelegate
+
+extension SupplementaryCollection: RecordStoreDelegate {
+    func storeDidUpdateRecords() {
+        updateVisibleTrackers(for: currentDate)
     }
 }

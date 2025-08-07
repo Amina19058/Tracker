@@ -64,6 +64,9 @@ final class CreateTrackerViewController: UIViewController {
             eventButton.leadingAnchor.constraint(equalTo: habitButton.leadingAnchor),
             eventButton.trailingAnchor.constraint(equalTo: habitButton.trailingAnchor)
         ])
+        
+        self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for: UIBarMetrics.default)
+        self.navigationController?.navigationBar.shadowImage = UIImage()
     }
 
     @objc private func createHabit() {
