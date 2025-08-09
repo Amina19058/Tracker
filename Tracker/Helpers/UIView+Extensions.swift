@@ -38,6 +38,7 @@ final class StubView: UIView {
     private func setupUI() {
         backgroundColor = .ypWhite
         stubTextLabel.text = model.text
+        stubTextLabel.numberOfLines = 0
         stubImageView.image = model.image
         
         [stubTextLabel, stubImageView].forEach {

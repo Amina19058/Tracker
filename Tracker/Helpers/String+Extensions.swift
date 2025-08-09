@@ -7,6 +7,10 @@
 
 extension String {
     enum Labels {
+        static let onboardingButtonTitle = "Вот это технологии!"
+        static let firstOnboardingTitle = "Отслеживайте только то, что хотите"
+        static let secondOnboardingTitle = "Даже если это не литры воды и йога"
+
         static let trackersTitle = "Трекеры"
         static let statisticsTitle = "Статистика"
         static let createTrackerTitle = "Создание трекера"

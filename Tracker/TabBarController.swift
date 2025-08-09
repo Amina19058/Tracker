@@ -27,6 +27,19 @@ final class TabBarController: UITabBarController, UITabBarControllerDelegate {
         setupTabs()
     }
     
+    func showOnboardingIfNeeded() {
+        let userDefaults = UserDefaults.standard
+        if !UserDefaults.standard.bool(forKey: "hasSeenOnboarding") {
+            let onboardingVC = OnboardingPageViewController(
+                transitionStyle: .scroll,
+                navigationOrientation: .horizontal,
+                options: nil
+            )
+            onboardingVC.modalPresentationStyle = .fullScreen
+            present(onboardingVC, animated: true)
+        }
+    }
+    
     private func setupTabs() {
         let trackersNavController = createTrackersNavController()
         
