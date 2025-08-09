@@ -25,7 +25,15 @@ enum PickerItem: Int, CaseIterable {
 final class NewTrackerFormView: UIView {
     private let type: TrackerType
     private let maxCharacterLimit = 38
+    
     private var selectedDays: [WeekDay] = [] {
+        didSet {
+            tableView.reloadData()
+            onFormChanged?()
+        }
+    }
+    
+    var selectedCategory: TrackerCategory? {
         didSet {
             tableView.reloadData()
             onFormChanged?()
@@ -41,8 +49,9 @@ final class NewTrackerFormView: UIView {
         let isScheduleValid = type == .event || !selectedSchedule.isEmpty
         let isEmojiSelected = selectedEmoji != nil
         let isColorSelected = selectedColor != nil
+        let isCategorySelected = selectedCategory != nil
         
-        return isNameValid && isScheduleValid && isEmojiSelected && isColorSelected
+        return isNameValid && isScheduleValid && isEmojiSelected && isColorSelected && isCategorySelected
     }
     
     var trackerName: String = ""
@@ -77,17 +86,7 @@ final class NewTrackerFormView: UIView {
         return stack
     }()
     
-    private let nameTextField: UITextField = {
-        let textField = UITextField()
-        textField.placeholder = .Labels.nameFieldPlaceholder
-        textField.backgroundColor = .ypGrayBackground
-        textField.layer.cornerRadius = 16
-        textField.font = .regular17
-        textField.clearButtonMode = .whileEditing
-        textField.setLeftPadding(16)
-        textField.heightAnchor.constraint(equalToConstant: 75).isActive = true
-        return textField
-    }()
+    private let nameTextField = YPPlaceholderTextField()
     
     private let errorLabel: UILabel = {
         let label = UILabel()
@@ -172,15 +171,15 @@ final class NewTrackerFormView: UIView {
     private func setupUI() {        
         backgroundColor = .ypWhite
         
+        nameTextField.placeholder = .Labels.trackerNamePlaceholder
         nameTextField.delegate = self
         nameTextField.addTarget(self, action: #selector(trackerNameChanged), for: .editingChanged)
         
         addSubview(scrollView)
         scrollView.addSubview(contentStackView)
         
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
-        tapGesture.cancelsTouchesInView = false
-        scrollView.addGestureRecognizer(tapGesture)
+        enableKeyboardDismissOnTap()
+        enableKeyboardDismissOnScroll(for: scrollView)
         
         stackView.addArrangedSubview(nameTextField)
         stackView.addArrangedSubview(errorLabel)
@@ -239,10 +238,6 @@ final class NewTrackerFormView: UIView {
         collectionView.register(ColorCell.self, forCellWithReuseIdentifier: ColorCell.identifier)
         collectionView.register(CollectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: CollectionHeader.identifier)
     }
-    
-    @objc private func dismissKeyboard() {
-        endEditing(true)
-    }
 }
 
 extension NewTrackerFormView: UITableViewDelegate, UITableViewDataSource {
@@ -262,6 +257,8 @@ extension NewTrackerFormView: UITableViewDelegate, UITableViewDataSource {
 
         if title == ParameterCellType.schedule.rawValue {
             value = formattedSchedule(from: selectedDays)
+        } else if title == ParameterCellType.category.rawValue {
+            value = selectedCategory?.title
         }
 
         cell.configure(title: title, value: value)
@@ -287,6 +284,24 @@ extension NewTrackerFormView: UITableViewDelegate, UITableViewDataSource {
             
             delegate?.navigationController?.pushViewController(scheduleVC, animated: true)
             
+        case ParameterCellType.category.rawValue:
+            let store = DataStoreManager.shared.categoryStore
+            let categoryVM = CategoryViewModel(store: store, selectedCategory: selectedCategory)
+            let categoryVC = CategoryViewController(viewModel: categoryVM)
+            categoryVC.delegate = self
+
+            categoryVM.onSelectionChanged = { [weak self] selected in
+                guard let self, let selected else { return }
+                self.selectedCategory = selected
+                if let index = self.tableItems.firstIndex(of: ParameterCellType.category.rawValue) {
+                    self.tableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none)
+                }
+                self.delegate?.navigationController?.popViewController(animated: true)
+            }
+
+            delegate?.navigationController?.pushViewController(categoryVC, animated: true)
+
+            
         default:
             break
         }
@@ -311,7 +326,15 @@ extension NewTrackerFormView: ScheduleViewControllerDelegate {
 
         return sorted.map { $0.shortName }.joined(separator: ", ")
     }
+}
 
+extension NewTrackerFormView: CategoryViewControllerDelegate {
+    func didSelectCategory(_ selectedCategory: TrackerCategory) {
+        self.selectedCategory = selectedCategory
+        if let index = tableItems.firstIndex(of: ParameterCellType.category.rawValue) {
+            tableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none)
+        }
+    }
 }
 
 extension NewTrackerFormView: UITextFieldDelegate {

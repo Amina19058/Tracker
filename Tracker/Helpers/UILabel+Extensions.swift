@@ -8,7 +8,7 @@
 import UIKit
 
 final class YPLabel: UILabel {
-    init() {
+    init(with text: String?) {
         super.init(frame: .zero)
         self.font = .medium16
         self.textColor = .ypBlack
