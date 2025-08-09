@@ -110,9 +110,9 @@ final class NewTrackerViewController: UIViewController {
             schedule: schedule
         )
 
-        let categoryTitle = "Без категории"
+        guard let category = formView.selectedCategory else { return }
 
-        delegate?.onCreateTracker(tracker: tracker, categoryTitle: categoryTitle)
+        delegate?.onCreateTracker(tracker: tracker, categoryTitle: category.title)
         navigationController?.popViewController(animated: true)
     }
     
