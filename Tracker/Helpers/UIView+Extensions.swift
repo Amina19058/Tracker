@@ -52,7 +52,7 @@ final class StubView: UIView {
             stubImageView.topAnchor.constraint(equalTo: topAnchor),
             stubImageView.widthAnchor.constraint(equalToConstant: 80),
             stubImageView.heightAnchor.constraint(equalToConstant: 80),
-
+            
             stubTextLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
             stubTextLabel.topAnchor.constraint(equalTo: stubImageView.bottomAnchor, constant: 8),
             stubTextLabel.bottomAnchor.constraint(equalTo: bottomAnchor)

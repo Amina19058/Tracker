@@ -36,7 +36,7 @@ extension String {
         static let categoryTitle = "Категория"
         static let addCategoryButtonTitle = "Добавить категорию"
         
-        static let categoryScreenStubText = "Привычки и события можно объединить по смыслу"
+        static let categoryScreenStubText = "Привычки и события можно\nобъединить по смыслу"
         
         static let newCategoryTitle = "Новая категория"
         static let categoryNamePlaceholder = "Введите название категории"
