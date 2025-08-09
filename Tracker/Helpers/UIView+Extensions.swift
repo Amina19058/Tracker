@@ -39,6 +39,7 @@ final class StubView: UIView {
         backgroundColor = .ypWhite
         stubTextLabel.text = model.text
         stubTextLabel.numberOfLines = 0
+        stubTextLabel.lineBreakMode = .byWordWrapping
         stubImageView.image = model.image
         
         [stubTextLabel, stubImageView].forEach {

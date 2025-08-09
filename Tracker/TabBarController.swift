@@ -28,7 +28,6 @@ final class TabBarController: UITabBarController, UITabBarControllerDelegate {
     }
     
     func showOnboardingIfNeeded() {
-        let userDefaults = UserDefaults.standard
         if !UserDefaults.standard.bool(forKey: "hasSeenOnboarding") {
             let onboardingVC = OnboardingPageViewController(
                 transitionStyle: .scroll,
