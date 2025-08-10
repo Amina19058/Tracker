@@ -7,6 +7,10 @@
 
 extension String {
     enum Labels {
+        static let onboardingButtonTitle = "Вот это технологии!"
+        static let firstOnboardingTitle = "Отслеживайте только то, что хотите"
+        static let secondOnboardingTitle = "Даже если это не литры воды и йога"
+
         static let trackersTitle = "Трекеры"
         static let statisticsTitle = "Статистика"
         static let createTrackerTitle = "Создание трекера"
@@ -15,12 +19,12 @@ extension String {
         static let newEventTitle = "Новое нерегулярное событие"
 
         static let searchFieldPlaceholder = "Поиск"
-        static let stubText = "Что будем отслеживать?"
+        static let trackersScreenStubText = "Что будем отслеживать?"
         
         static let habitButtonTitle = "Привычка"
         static let eventButtonTitle = "Нерегулярное событие"
         
-        static let nameFieldPlaceholder = "Введите название трекера"
+        static let trackerNamePlaceholder = "Введите название трекера"
         static let categoryButtonTitle = "Категория"
         static let scheduleButtonTitle = "Расписание"
         static let createButtonTitle = "Создать"
@@ -28,6 +32,19 @@ extension String {
         
         static let scheduleTitle = "Расписание"
         static let doneButtonTitle = "Готово"
+        
+        static let categoryTitle = "Категория"
+        static let addCategoryButtonTitle = "Добавить категорию"
+        
+        static let categoryScreenStubText = "Привычки и события можно\nобъединить по смыслу"
+        
+        static let newCategoryTitle = "Новая категория"
+        static let categoryNamePlaceholder = "Введите название категории"
+        
+        static let editCategoryTitle = "Редактирование категории"
+        static let editButtonTitle = "Редактировать"
+        static let deleteButtonTitle = "Удалить"
+        static let deleteCategoryAlertMessage = "Эта категория точно не нужна?"
     }
             
     enum TabBar {

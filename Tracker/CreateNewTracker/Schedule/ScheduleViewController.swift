@@ -32,7 +32,7 @@ final class ScheduleViewController: UIViewController {
         return tableView
     }()
     
-    private let doneButton = UIButton(type: .system)
+    private let doneButton = YPButton()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -51,11 +51,6 @@ final class ScheduleViewController: UIViewController {
         view.addSubview(tableView)
 
         doneButton.setTitle(.Labels.doneButtonTitle, for: .normal)
-        doneButton.setTitleColor(.white, for: .normal)
-        doneButton.titleLabel?.font = .medium16
-        doneButton.backgroundColor = .ypBlack
-        doneButton.layer.cornerRadius = 16
-        doneButton.translatesAutoresizingMaskIntoConstraints = false
         doneButton.addTarget(self, action: #selector(doneTapped), for: .touchUpInside)
         view.addSubview(doneButton)
 
@@ -67,8 +62,7 @@ final class ScheduleViewController: UIViewController {
             
             doneButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             doneButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            doneButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
-            doneButton.heightAnchor.constraint(equalToConstant: 60),
+            doneButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16)
         ])
     }
 

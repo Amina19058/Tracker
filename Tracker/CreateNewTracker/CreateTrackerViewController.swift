@@ -10,20 +10,16 @@ import UIKit
 final class CreateTrackerViewController: UIViewController {
     weak var delegate: CreateTrackerViewControllerDelegate?
 
-    private let titleLabel: YPLabel = {
-        let label = YPLabel()
-        label.text = .Labels.createTrackerTitle
-        return label
-    }()
+    private let titleLabel = YPLabel(with: .Labels.createTrackerTitle)
 
-    private let habitButton: UIButton = {
-        let button = UIButton()
+    private let habitButton: YPButton = {
+        let button = YPButton()
         button.setTitle(.Labels.habitButtonTitle, for: .normal)
         return button
     }()
 
-    private let eventButton: UIButton = {
-        let button = UIButton()
+    private let eventButton: YPButton = {
+        let button = YPButton()
         button.setTitle(.Labels.eventButtonTitle, for: .normal)
         return button
     }()
@@ -35,15 +31,8 @@ final class CreateTrackerViewController: UIViewController {
         setupUI()
     }
 
-    private func setupUI() {
-        view.addSubview(titleLabel)
-        
-        [habitButton, eventButton].forEach {
-            $0.titleLabel?.font = .medium16
-            $0.titleLabel?.textColor = .ypWhite
-            $0.backgroundColor = .ypBlack
-            $0.layer.cornerRadius = 16
-            $0.translatesAutoresizingMaskIntoConstraints = false
+    private func setupUI() {        
+        [titleLabel, habitButton, eventButton].forEach {
             view.addSubview($0)
         }
         
@@ -53,13 +42,11 @@ final class CreateTrackerViewController: UIViewController {
         NSLayoutConstraint.activate([
             titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 24),
             titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-
-            habitButton.heightAnchor.constraint(equalToConstant: 60),
+            
             habitButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
             habitButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
             habitButton.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             
-            eventButton.heightAnchor.constraint(equalToConstant: 60),
             eventButton.topAnchor.constraint(equalTo: habitButton.bottomAnchor, constant: 16),
             eventButton.leadingAnchor.constraint(equalTo: habitButton.leadingAnchor),
             eventButton.trailingAnchor.constraint(equalTo: habitButton.trailingAnchor)

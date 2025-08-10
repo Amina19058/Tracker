@@ -18,6 +18,7 @@ final class TrackersViewController: UIViewController {
     }()
 
     private var helper: SupplementaryCollection?
+    private let storage = DataStoreManager.shared
     
     private let titleLabel: UILabel = {
         let titleLabel = UILabel()
@@ -40,15 +41,18 @@ final class TrackersViewController: UIViewController {
         return searchBar
     }()
     
-    private let stubView: UIView = {
-        let view = UIView()
+    private let stubView: StubView = {
+        let view = StubView(model: StubModel(
+            image: UIImage(named: .Trackers.starStubImage),
+            text: .Labels.trackersScreenStubText
+        ))
         view.translatesAutoresizingMaskIntoConstraints = false
+        
         return view
     }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
-                
         setupUI()
     }
 
@@ -60,6 +64,9 @@ final class TrackersViewController: UIViewController {
         setupStub()
         updateStubVisibility()
         helper?.updateVisibleTrackers(for: selectedDate)
+        
+        storage.trackerStore.delegate = self
+        storage.categoryStore.delegate = self
     }
     
     private func setupNavigationBar() {
@@ -109,35 +116,12 @@ final class TrackersViewController: UIViewController {
     }
     
     private func setupStub() {
-        let stubImageView = UIImageView(image: UIImage(named: .Trackers.starStubImage))
-        let stubTextLabel = UILabel()
-        stubTextLabel.text = .Labels.stubText
-        stubTextLabel.font = .medium12
-                
-        stubImageView.translatesAutoresizingMaskIntoConstraints = false
-        stubTextLabel.translatesAutoresizingMaskIntoConstraints = false
-
-        stubView.addSubview(stubImageView)
-        stubView.addSubview(stubTextLabel)
         view.addSubview(stubView)
 
         NSLayoutConstraint.activate([
             stubView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
-            stubView.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 220),
-            
-            stubImageView.centerXAnchor.constraint(equalTo: stubView.centerXAnchor),
-            stubImageView.topAnchor.constraint(equalTo: stubView.topAnchor),
-            stubImageView.widthAnchor.constraint(equalToConstant: 80),
-            stubImageView.heightAnchor.constraint(equalToConstant: 80),
-
-            stubTextLabel.centerXAnchor.constraint(equalTo: stubView.centerXAnchor),
-            stubTextLabel.topAnchor.constraint(equalTo: stubImageView.bottomAnchor, constant: 8),
-            stubTextLabel.bottomAnchor.constraint(equalTo: stubView.bottomAnchor)
+            stubView.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 220)
         ])
-        
-        stubImageView.accessibilityIdentifier = .AccessibilityIdentifiers.stubImage
-        stubTextLabel.accessibilityIdentifier = .AccessibilityIdentifiers.stubLabel
-
     }
     
     private func setupCollectionView() {
@@ -194,12 +178,7 @@ extension TrackersViewController: CreateTrackerViewControllerDelegate {
             }()!
 
         try? storage.trackerStore.addNewTracker(tracker, to: categoryCoreData)
-        
-        updateStubVisibility()
-        
         dismiss(animated: true, completion: nil)
-        
-        
     }
 }
 
@@ -209,3 +188,18 @@ extension TrackersViewController: SupplementaryCollectionDelegate {
     }
 }
 
+extension TrackersViewController: TrackerStoreDelegate {
+    func store(_ store: TrackerStore, didUpdate update: TrackerStoreUpdate) {
+        helper?.updateVisibleTrackers(for: selectedDate)
+        updateStubVisibility()
+        collectionView.reloadData()
+    }
+}
+
+extension TrackersViewController: CategoryStoreDelegate {
+    func storeDidUpdateCategories() {
+        helper?.updateVisibleTrackers(for: selectedDate)
+        updateStubVisibility()
+        collectionView.reloadData()
+    }
+}
