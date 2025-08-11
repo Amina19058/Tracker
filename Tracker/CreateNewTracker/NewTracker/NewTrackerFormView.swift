@@ -12,9 +12,16 @@ enum TrackerType {
     case event
 }
 
-enum ParameterCellType: String, CaseIterable {
-    case category = "Категория"
-    case schedule = "Расписание"
+enum ParameterCellType: CaseIterable {
+    case category
+    case schedule
+    
+    var title: String {
+        switch self {
+        case .category: return L10n.categoryTitle
+        case .schedule: return L10n.scheduleTitle
+        }
+    }
 }
 
 enum PickerItem: Int, CaseIterable {
@@ -90,7 +97,7 @@ final class NewTrackerFormView: UIView {
     
     private let errorLabel: UILabel = {
         let label = UILabel()
-        label.text = "Ограничение 38 символов"
+        label.text = L10n.trackerNameLimitErrorMessage
         label.font = .regular17
         label.textColor = .ypRed
         label.isHidden = true
@@ -105,6 +112,7 @@ final class NewTrackerFormView: UIView {
         tableView.layer.cornerRadius = 16
         tableView.layer.masksToBounds = true
         tableView.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+        tableView.separatorColor = .ypGray
         tableView.tableHeaderView = UIView(frame: .zero)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         return tableView
@@ -114,8 +122,8 @@ final class NewTrackerFormView: UIView {
     private var collectionViewHeightConstraint: NSLayoutConstraint!
 
     private var tableItems: [String] {
-        let categoryTitle: String = ParameterCellType.category.rawValue
-        let scheduleTitle: String = ParameterCellType.schedule.rawValue
+        let categoryTitle: String = ParameterCellType.category.title
+        let scheduleTitle: String = ParameterCellType.schedule.title
         
         return type == .habit ? [categoryTitle, scheduleTitle] : [categoryTitle]
     }
@@ -171,7 +179,7 @@ final class NewTrackerFormView: UIView {
     private func setupUI() {        
         backgroundColor = .ypWhite
         
-        nameTextField.placeholder = .Labels.trackerNamePlaceholder
+        nameTextField.placeholder = L10n.trackerNamePlaceholder
         nameTextField.delegate = self
         nameTextField.addTarget(self, action: #selector(trackerNameChanged), for: .editingChanged)
         
@@ -255,9 +263,9 @@ extension NewTrackerFormView: UITableViewDelegate, UITableViewDataSource {
         let title = tableItems[indexPath.row]
         var value: String?
 
-        if title == ParameterCellType.schedule.rawValue {
+        if title == ParameterCellType.schedule.title {
             value = formattedSchedule(from: selectedDays)
-        } else if title == ParameterCellType.category.rawValue {
+        } else if title == ParameterCellType.category.title {
             value = selectedCategory?.title
         }
 
@@ -278,13 +286,13 @@ extension NewTrackerFormView: UITableViewDelegate, UITableViewDataSource {
         let selectedItem = tableItems[indexPath.row]
         
         switch selectedItem {
-        case ParameterCellType.schedule.rawValue:
+        case ParameterCellType.schedule.title:
             let scheduleVC = ScheduleViewController()
             scheduleVC.delegate = self
             
             delegate?.navigationController?.pushViewController(scheduleVC, animated: true)
             
-        case ParameterCellType.category.rawValue:
+        case ParameterCellType.category.title:
             let store = DataStoreManager.shared.categoryStore
             let categoryVM = CategoryViewModel(store: store, selectedCategory: selectedCategory)
             let categoryVC = CategoryViewController(viewModel: categoryVM)
@@ -293,7 +301,7 @@ extension NewTrackerFormView: UITableViewDelegate, UITableViewDataSource {
             categoryVM.onSelectionChanged = { [weak self] selected in
                 guard let self, let selected else { return }
                 self.selectedCategory = selected
-                if let index = self.tableItems.firstIndex(of: ParameterCellType.category.rawValue) {
+                if let index = self.tableItems.firstIndex(of: ParameterCellType.category.title) {
                     self.tableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none)
                 }
                 self.delegate?.navigationController?.popViewController(animated: true)
@@ -319,7 +327,7 @@ extension NewTrackerFormView: ScheduleViewControllerDelegate {
         let allDays = WeekDay.allCases
 
         if days.count == allDays.count {
-            return "Каждый день"
+            return L10n.everyDayScheduleValue
         }
 
         let sorted = allDays.filter { days.contains($0) }
@@ -331,7 +339,7 @@ extension NewTrackerFormView: ScheduleViewControllerDelegate {
 extension NewTrackerFormView: CategoryViewControllerDelegate {
     func didSelectCategory(_ selectedCategory: TrackerCategory) {
         self.selectedCategory = selectedCategory
-        if let index = tableItems.firstIndex(of: ParameterCellType.category.rawValue) {
+        if let index = tableItems.firstIndex(of: ParameterCellType.category.title) {
             tableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none)
         }
     }
@@ -405,9 +413,9 @@ extension NewTrackerFormView: UICollectionViewDataSource, UICollectionViewDelega
         }
         
         if indexPath.section == PickerItem.emoji.rawValue {
-            view.configure(title: "Emoji")
+            view.configure(title: L10n.emojiSectionTitle)
         } else if indexPath.section == PickerItem.color.rawValue {
-            view.configure(title: "Цвет")
+            view.configure(title: L10n.colorSectionTitle)
         }
         
         return view

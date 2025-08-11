@@ -7,7 +7,7 @@
 
 import UIKit
 
-class OnboardingViewController: UIViewController {
+final class OnboardingViewController: UIViewController {
     private lazy var imageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
@@ -25,7 +25,7 @@ class OnboardingViewController: UIViewController {
     
     private lazy var skipButton: YPButton = {
         let button = YPButton()
-        button.setTitle(.Labels.onboardingButtonTitle, for: .normal)
+        button.setTitle(L10n.onboardingButtonTitle, for: .normal)
         button.addTarget(self, action: #selector(skipTapped), for: .touchUpInside)
         return button
     }()

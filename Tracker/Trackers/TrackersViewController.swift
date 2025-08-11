@@ -23,7 +23,7 @@ final class TrackersViewController: UIViewController {
     private let titleLabel: UILabel = {
         let titleLabel = UILabel()
         
-        titleLabel.text = .Labels.trackersTitle
+        titleLabel.text = L10n.trackersTitle
         titleLabel.font = .title
         titleLabel.textColor = .ypBlack
         
@@ -33,7 +33,7 @@ final class TrackersViewController: UIViewController {
     private let searchBar: UISearchBar = {
         let searchBar = UISearchBar()
         
-        searchBar.placeholder = .Labels.searchFieldPlaceholder
+        searchBar.placeholder = L10n.searchFieldPlaceholder
         searchBar.searchBarStyle = .minimal
         searchBar.layer.cornerRadius = 10
         searchBar.clipsToBounds = true
@@ -44,7 +44,7 @@ final class TrackersViewController: UIViewController {
     private let stubView: StubView = {
         let view = StubView(model: StubModel(
             image: UIImage(named: .Trackers.starStubImage),
-            text: .Labels.trackersScreenStubText
+            text: L10n.trackersScreenStubText
         ))
         view.translatesAutoresizingMaskIntoConstraints = false
         
@@ -57,6 +57,8 @@ final class TrackersViewController: UIViewController {
     }
 
     private func setupUI() {
+        view.backgroundColor = .ypWhite
+        
         setupNavigationBar()
         setupTitleLabel()
         setupSearchBar()
@@ -77,13 +79,7 @@ final class TrackersViewController: UIViewController {
         addButton.translatesAutoresizingMaskIntoConstraints = false
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: addButton)
         
-        let datePicker = UIDatePicker()
-        datePicker.preferredDatePickerStyle = .compact
-        datePicker.datePickerMode = .date
-        datePicker.locale = Locale(identifier: "ru_CH")
-        datePicker.tintColor = .blue
-        datePicker.layer.cornerRadius = 8
-        datePicker.clipsToBounds = true
+        let datePicker = DatePicker
         datePicker.addTarget(self, action: #selector(datePickerValueChanged(_:)), for: .valueChanged)
         navigationItem.rightBarButtonItem =  UIBarButtonItem(customView: datePicker)
     }
@@ -125,7 +121,7 @@ final class TrackersViewController: UIViewController {
     }
     
     private func setupCollectionView() {
-        collectionView.backgroundColor = .white
+        collectionView.backgroundColor = .ypWhite
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(collectionView)
         

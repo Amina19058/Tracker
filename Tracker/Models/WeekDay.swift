@@ -5,24 +5,36 @@
 //  Created by Amina Khusnutdinova on 14.07.2025.
 //
 
-enum WeekDay: String, CaseIterable, Codable {
-    case monday = "Понедельник"
-    case tuesday = "Вторник"
-    case wednesday = "Среда"
-    case thursday = "Четверг"
-    case friday = "Пятница"
-    case saturday = "Суббота"
-    case sunday = "Воскресенье"
+enum WeekDay: CaseIterable, Codable {
+    case monday
+    case tuesday
+    case wednesday
+    case thursday
+    case friday
+    case saturday
+    case sunday
+
+    var fullName: String {
+        switch self {
+        case .monday: return L10n.monday
+        case .tuesday: return L10n.tuesday
+        case .wednesday: return L10n.wednesday
+        case .thursday: return L10n.thursday
+        case .friday: return L10n.friday
+        case .saturday: return L10n.saturday
+        case .sunday: return L10n.sunday
+        }
+    }
 
     var shortName: String {
         switch self {
-        case .monday: return "Пн"
-        case .tuesday: return "Вт"
-        case .wednesday: return "Ср"
-        case .thursday: return "Чт"
-        case .friday: return "Пт"
-        case .saturday: return "Сб"
-        case .sunday: return "Вс"
+        case .monday: return L10n.mondayShort
+        case .tuesday: return L10n.tuesdayShort
+        case .wednesday: return L10n.wednesdayShort
+        case .thursday: return L10n.thursdayShort
+        case .friday: return L10n.fridayShort
+        case .saturday: return L10n.saturdayShort
+        case .sunday: return L10n.sundayShort
         }
     }
 }

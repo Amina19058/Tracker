@@ -19,7 +19,7 @@ final class NewTrackerViewController: UIViewController {
     
     private let cancelButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle(.Labels.cancelButtonTitle, for: .normal)
+        button.setTitle(L10n.cancelButtonTitle, for: .normal)
         button.setTitleColor(.ypRed, for: .normal)
         button.layer.borderColor = UIColor.ypRed.cgColor
         button.layer.borderWidth = 1
@@ -28,13 +28,9 @@ final class NewTrackerViewController: UIViewController {
         return button
     }()
     
-    private let createButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle(.Labels.createButtonTitle, for: .normal)
-        button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = .lightGray
-        button.layer.cornerRadius = 16
-        button.translatesAutoresizingMaskIntoConstraints = false
+    private let createButton: YPButton = {
+        let button = YPButton()
+        button.setTitle(L10n.createButtonTitle, for: .normal)
         return button
     }()
     
@@ -57,7 +53,7 @@ final class NewTrackerViewController: UIViewController {
         formView.delegate = self
         
         view.backgroundColor = .ypWhite
-        navigationItem.title = type == .event ? .Labels.newEventTitle : .Labels.newHabitTitle
+        navigationItem.title = type == .event ? L10n.newEventTitle : L10n.newHabitTitle
         navigationItem.hidesBackButton = true
         
         setupUI()

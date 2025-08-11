@@ -11,8 +11,9 @@ final class YPButton: UIButton {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setTitleColor(.ypWhite, for: .normal)
+        setTitleColor(.white, for: .disabled)
         titleLabel?.font = .medium16
-        backgroundColor = .ypBlack
+        backgroundColor = isEnabled ? .ypBlack : .ypGray
         layer.cornerRadius = 16
         layer.masksToBounds = true
         translatesAutoresizingMaskIntoConstraints = false

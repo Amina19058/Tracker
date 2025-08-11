@@ -7,7 +7,7 @@
 
 import UIKit
 
-class OnboardingPageViewController: UIPageViewController {
+final class OnboardingPageViewController: UIPageViewController {
     lazy var pageControl: UIPageControl = {
         let pageControl = UIPageControl()
         pageControl.numberOfPages = pages.count
@@ -22,19 +22,20 @@ class OnboardingPageViewController: UIPageViewController {
     
     lazy var pages: [UIViewController] = {
         let skipAction = {
-            UserDefaults.standard.set(true, forKey: "hasSeenOnboarding")
+            UserDefaultsService.shared.hasSeenOnboarding = true
+//            UserDefaults.standard.set(true, forKey: "hasSeenOnboarding")
             self.dismiss(animated: true, completion: nil)
         }
         
         let first = OnboardingViewController(
             image: UIImage(resource: .onboarding1),
-            text: .Labels.firstOnboardingTitle,
+            text: L10n.firstOnboardingTitle,
             skipAction: skipAction
         )
         
         let second = OnboardingViewController(
             image: UIImage(resource: .onboarding2),
-            text: .Labels.secondOnboardingTitle,
+            text: L10n.secondOnboardingTitle,
             skipAction: skipAction
         )
         

@@ -26,6 +26,7 @@ final class ScheduleViewController: UIViewController {
         
         tableView.separatorStyle = .singleLine
         tableView.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+        tableView.separatorColor = .ypGray
         tableView.tableHeaderView = UIView(frame: .zero)
         
         tableView.translatesAutoresizingMaskIntoConstraints = false
@@ -37,7 +38,7 @@ final class ScheduleViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        navigationItem.title = .Labels.scheduleTitle
+        navigationItem.title = L10n.scheduleTitle
         navigationItem.hidesBackButton = true
         view.backgroundColor = .ypWhite
         
@@ -50,7 +51,7 @@ final class ScheduleViewController: UIViewController {
         tableView.register(ScheduleDayCell.self, forCellReuseIdentifier: ScheduleDayCell.identifier)
         view.addSubview(tableView)
 
-        doneButton.setTitle(.Labels.doneButtonTitle, for: .normal)
+        doneButton.setTitle(L10n.doneButtonTitle, for: .normal)
         doneButton.addTarget(self, action: #selector(doneTapped), for: .touchUpInside)
         view.addSubview(doneButton)
 
@@ -87,7 +88,7 @@ extension ScheduleViewController: UITableViewDataSource, UITableViewDelegate {
 
         let day = weekdays[indexPath.row]
         let isSelected = selectedDays.contains(day)
-        cell.configure(title: day.rawValue, isSelected: isSelected)
+        cell.configure(title: day.fullName, isSelected: isSelected)
 
         cell.toggleSwitchChanged = { [weak self] isOn in
             guard let self else { return }

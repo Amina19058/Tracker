@@ -21,7 +21,7 @@ final class TrackerCell: UICollectionViewCell {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = .medium12
-        label.textColor = .ypWhite
+        label.textColor = .white
         label.numberOfLines = 2
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -37,7 +37,7 @@ final class TrackerCell: UICollectionViewCell {
     
     private let emojiBackgroundView: UIView = {
         let backgroundView = UIView()
-        backgroundView.backgroundColor = .ypWhite.withAlphaComponent(0.3)
+        backgroundView.backgroundColor = .white.withAlphaComponent(0.3)
         backgroundView.layer.cornerRadius = 12
         backgroundView.translatesAutoresizingMaskIntoConstraints = false
         
@@ -133,7 +133,7 @@ final class TrackerCell: UICollectionViewCell {
                                   UIImage(systemName: "plus", withConfiguration: config)
         plusButton.setImage(image, for: .normal)
 
-        plusButton.tintColor = .ypWhite
+        plusButton.tintColor = .white
         plusButton.backgroundColor = isCompletedToday ? color?.withAlphaComponent(0.3) : color
     }
     
@@ -143,7 +143,10 @@ final class TrackerCell: UICollectionViewCell {
     }
     
     private func updateQuantityLabel() {
-        quantityLabel.text = "\(daysCount) \(String.pluralizeDay(daysCount))"
+        quantityLabel.text = String.localizedStringWithFormat(
+            NSLocalizedString("days_count_text", comment: ""),
+            daysCount
+        )
     }
     
     private func setupUI() {

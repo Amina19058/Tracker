@@ -18,25 +18,26 @@ final class TabBarController: UITabBarController, UITabBarControllerDelegate {
         
         tabBar.tintColor = .ypBlue
         tabBar.backgroundColor = .ypWhite
+        tabBar.isTranslucent = false
         tabBar.unselectedItemTintColor = .ypGray
         
         tabBar.layer.borderWidth = 0.5
-        tabBar.layer.borderColor = UIColor.ypGray.cgColor
+        tabBar.layer.borderColor = UIColor.ypGrayBorder.cgColor
         tabBar.clipsToBounds = true
         
         setupTabs()
     }
     
     func showOnboardingIfNeeded() {
-        if !UserDefaults.standard.bool(forKey: "hasSeenOnboarding") {
-            let onboardingVC = OnboardingPageViewController(
-                transitionStyle: .scroll,
-                navigationOrientation: .horizontal,
-                options: nil
-            )
-            onboardingVC.modalPresentationStyle = .fullScreen
-            present(onboardingVC, animated: true)
-        }
+        guard !UserDefaultsService.shared.hasSeenOnboarding else { return }
+
+        let onboardingVC = OnboardingPageViewController(
+            transitionStyle: .scroll,
+            navigationOrientation: .horizontal,
+            options: nil
+        )
+        onboardingVC.modalPresentationStyle = .fullScreen
+        present(onboardingVC, animated: true)
     }
     
     private func setupTabs() {
