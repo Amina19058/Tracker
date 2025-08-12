@@ -50,6 +50,8 @@
 "delete_button_title" = "Delete";
 "delete_category_alert_message" = "Are you sure you don’t need this category?";
 
+"statistics_screen_stub_text" = "There is nothing to analyze yet";
+
 "monday" = "Monday";
 "tuesday" = "Tuesday";
 "wednesday" = "Wednesday";

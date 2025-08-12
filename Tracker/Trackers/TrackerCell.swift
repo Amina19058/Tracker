@@ -8,7 +8,7 @@
 import UIKit
 
 final class TrackerCell: UICollectionViewCell {
-    static let identifier = "cell"
+    static let identifier = "TrackerCell"
     
     private var isCompletedToday = false
     private var color: UIColor?

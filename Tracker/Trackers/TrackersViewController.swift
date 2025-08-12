@@ -55,6 +55,24 @@ final class TrackersViewController: UIViewController {
         super.viewDidLoad()
         setupUI()
     }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        AnalyticsService.shared.report(
+            event: .open,
+            screen: .main
+        )
+    }
+
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        
+        AnalyticsService.shared.report(
+            event: .close,
+            screen: .main
+        )
+    }
 
     private func setupUI() {
         view.backgroundColor = .ypWhite

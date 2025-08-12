@@ -19,7 +19,7 @@ final class OnboardingViewController: UIViewController {
         label.textAlignment = .center
         label.numberOfLines = 0
         label.font = .bold32
-        label.textColor = .ypBlack
+        label.textColor = .black
         return label
     }()
     
@@ -27,6 +27,8 @@ final class OnboardingViewController: UIViewController {
         let button = YPButton()
         button.setTitle(L10n.onboardingButtonTitle, for: .normal)
         button.addTarget(self, action: #selector(skipTapped), for: .touchUpInside)
+        button.backgroundColor = .black
+        button.setTitleColor(.white, for: .normal)
         return button
     }()
     

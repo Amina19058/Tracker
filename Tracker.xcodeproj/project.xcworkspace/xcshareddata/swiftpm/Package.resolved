@@ -1,6 +1,33 @@
 {
-  "originHash" : "09b08963887ce6eac26952e8acb25256a8ec102f2b5528ae68a97fa296723712",
+  "originHash" : "36260716660c52d63fda2d804e0d9c495996a8a7d56768b711519c052cd8d2e7",
   "pins" : [
+    {
+      "identity" : "appmetrica-sdk-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/appmetrica/appmetrica-sdk-ios",
+      "state" : {
+        "revision" : "2e46941dbea29d3ccf80c05f9c76e6ed45bc5353",
+        "version" : "5.11.2"
+      }
+    },
+    {
+      "identity" : "kscrash",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/kstenerud/KSCrash",
+      "state" : {
+        "revision" : "b87a3ef5b0b84e2a34a546b9836813756cd362a9",
+        "version" : "2.0.0"
+      }
+    },
+    {
+      "identity" : "metrica-sdk-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/yandexmobile/metrica-sdk-ios",
+      "state" : {
+        "revision" : "13d8b11181a33938ef42759d49466a621df5e7db",
+        "version" : "4.5.2"
+      }
+    },
     {
       "identity" : "swift-custom-dump",
       "kind" : "remoteSourceControl",

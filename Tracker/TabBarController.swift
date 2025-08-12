@@ -62,15 +62,18 @@ final class TabBarController: UITabBarController, UITabBarControllerDelegate {
     }
     
     private func createStatisticsController() -> UIViewController {
-        let statisticsViewController = StatisticsViewController()
+        let store = DataStoreManager.shared.recordStore
+        let statisticsVM = StatisticsViewModel(recordStore: store)
+        
+        let statisticsViewController = StatisticsViewController(viewModel: statisticsVM)
         
         let statisticsBarItem = UITabBarItem(title: tabBarStrings.statisticsTitle,
                                              image: UIImage(named: tabBarStrings.statisticsOffImage),
                                              selectedImage: UIImage(named: tabBarStrings.statisticsOnImage))
         statisticsViewController.tabBarItem = statisticsBarItem
         
-//        let statisticsNavController = UINavigationController(rootViewController: statisticsViewController)
+        let statisticsNavController = UINavigationController(rootViewController: statisticsViewController)
         
-        return statisticsViewController
+        return statisticsNavController
     }
 }

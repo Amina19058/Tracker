@@ -13,8 +13,8 @@ final class OnboardingPageViewController: UIPageViewController {
         pageControl.numberOfPages = pages.count
         pageControl.currentPage = 0
         
-        pageControl.currentPageIndicatorTintColor = .ypBlack
-        pageControl.pageIndicatorTintColor = .ypBlack.withAlphaComponent(0.3)
+        pageControl.currentPageIndicatorTintColor = .black
+        pageControl.pageIndicatorTintColor = .black.withAlphaComponent(0.3)
         pageControl.translatesAutoresizingMaskIntoConstraints = false
         
         return pageControl
@@ -23,7 +23,6 @@ final class OnboardingPageViewController: UIPageViewController {
     lazy var pages: [UIViewController] = {
         let skipAction = {
             UserDefaultsService.shared.hasSeenOnboarding = true
-//            UserDefaults.standard.set(true, forKey: "hasSeenOnboarding")
             self.dismiss(animated: true, completion: nil)
         }
         

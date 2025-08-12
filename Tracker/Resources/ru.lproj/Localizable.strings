@@ -50,6 +50,8 @@
 "delete_button_title" = "Удалить";
 "delete_category_alert_message" = "Эта категория точно не нужна?";
 
+"statistics_screen_stub_text" = "Анализировать пока нечего";
+
 "monday" = "Понедельник";
 "tuesday" = "Вторник";
 "wednesday" = "Среда";

@@ -10,6 +10,13 @@
 		67C0DB9C2E4A3F6D00BEB8A7 /* InlineSnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = 67C0DB9B2E4A3F6D00BEB8A7 /* InlineSnapshotTesting */; };
 		67C0DB9E2E4A3F6D00BEB8A7 /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = 67C0DB9D2E4A3F6D00BEB8A7 /* SnapshotTesting */; };
 		67C0DBA02E4A3F6D00BEB8A7 /* SnapshotTestingCustomDump in Frameworks */ = {isa = PBXBuildFile; productRef = 67C0DB9F2E4A3F6D00BEB8A7 /* SnapshotTestingCustomDump */; };
+		67C0DC282E4A891900BEB8A7 /* YandexMobileMetrica in Frameworks */ = {isa = PBXBuildFile; productRef = 67C0DC272E4A891900BEB8A7 /* YandexMobileMetrica */; };
+		67C0DC2A2E4A891900BEB8A7 /* YandexMobileMetricaCrashes in Frameworks */ = {isa = PBXBuildFile; productRef = 67C0DC292E4A891900BEB8A7 /* YandexMobileMetricaCrashes */; };
+		67C0DCB22E4A8A1400BEB8A7 /* AppMetricaAdSupport in Frameworks */ = {isa = PBXBuildFile; productRef = 67C0DCB12E4A8A1400BEB8A7 /* AppMetricaAdSupport */; };
+		67C0DCB42E4A8A1400BEB8A7 /* AppMetricaCore in Frameworks */ = {isa = PBXBuildFile; productRef = 67C0DCB32E4A8A1400BEB8A7 /* AppMetricaCore */; };
+		67C0DCB62E4A8A1400BEB8A7 /* AppMetricaCrashes in Frameworks */ = {isa = PBXBuildFile; productRef = 67C0DCB52E4A8A1400BEB8A7 /* AppMetricaCrashes */; };
+		67C0DCB82E4A8A1400BEB8A7 /* AppMetricaLibraryAdapter in Frameworks */ = {isa = PBXBuildFile; productRef = 67C0DCB72E4A8A1400BEB8A7 /* AppMetricaLibraryAdapter */; };
+		67C0DCBA2E4A8A1400BEB8A7 /* AppMetricaScreenshot in Frameworks */ = {isa = PBXBuildFile; productRef = 67C0DCB92E4A8A1400BEB8A7 /* AppMetricaScreenshot */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -63,6 +70,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				67C0DCBA2E4A8A1400BEB8A7 /* AppMetricaScreenshot in Frameworks */,
+				67C0DC282E4A891900BEB8A7 /* YandexMobileMetrica in Frameworks */,
+				67C0DCB62E4A8A1400BEB8A7 /* AppMetricaCrashes in Frameworks */,
+				67C0DCB42E4A8A1400BEB8A7 /* AppMetricaCore in Frameworks */,
+				67C0DCB22E4A8A1400BEB8A7 /* AppMetricaAdSupport in Frameworks */,
+				67C0DCB82E4A8A1400BEB8A7 /* AppMetricaLibraryAdapter in Frameworks */,
+				67C0DC2A2E4A891900BEB8A7 /* YandexMobileMetricaCrashes in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -118,6 +132,13 @@
 			);
 			name = Tracker;
 			packageProductDependencies = (
+				67C0DC272E4A891900BEB8A7 /* YandexMobileMetrica */,
+				67C0DC292E4A891900BEB8A7 /* YandexMobileMetricaCrashes */,
+				67C0DCB12E4A8A1400BEB8A7 /* AppMetricaAdSupport */,
+				67C0DCB32E4A8A1400BEB8A7 /* AppMetricaCore */,
+				67C0DCB52E4A8A1400BEB8A7 /* AppMetricaCrashes */,
+				67C0DCB72E4A8A1400BEB8A7 /* AppMetricaLibraryAdapter */,
+				67C0DCB92E4A8A1400BEB8A7 /* AppMetricaScreenshot */,
 			);
 			productName = Tracker;
 			productReference = 676867552DE5B05B001D2A37 /* Tracker.app */;
@@ -180,6 +201,8 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				67C0DB9A2E4A3F6D00BEB8A7 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */,
+				67C0DC262E4A891900BEB8A7 /* XCRemoteSwiftPackageReference "metrica-sdk-ios" */,
+				67C0DCB02E4A8A1400BEB8A7 /* XCRemoteSwiftPackageReference "appmetrica-sdk-ios" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 676867562DE5B05B001D2A37 /* Products */;
@@ -503,6 +526,22 @@
 				minimumVersion = 1.18.6;
 			};
 		};
+		67C0DC262E4A891900BEB8A7 /* XCRemoteSwiftPackageReference "metrica-sdk-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/yandexmobile/metrica-sdk-ios";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.5.2;
+			};
+		};
+		67C0DCB02E4A8A1400BEB8A7 /* XCRemoteSwiftPackageReference "appmetrica-sdk-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/appmetrica/appmetrica-sdk-ios";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.11.2;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -520,6 +559,41 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 67C0DB9A2E4A3F6D00BEB8A7 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
 			productName = SnapshotTestingCustomDump;
+		};
+		67C0DC272E4A891900BEB8A7 /* YandexMobileMetrica */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 67C0DC262E4A891900BEB8A7 /* XCRemoteSwiftPackageReference "metrica-sdk-ios" */;
+			productName = YandexMobileMetrica;
+		};
+		67C0DC292E4A891900BEB8A7 /* YandexMobileMetricaCrashes */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 67C0DC262E4A891900BEB8A7 /* XCRemoteSwiftPackageReference "metrica-sdk-ios" */;
+			productName = YandexMobileMetricaCrashes;
+		};
+		67C0DCB12E4A8A1400BEB8A7 /* AppMetricaAdSupport */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 67C0DCB02E4A8A1400BEB8A7 /* XCRemoteSwiftPackageReference "appmetrica-sdk-ios" */;
+			productName = AppMetricaAdSupport;
+		};
+		67C0DCB32E4A8A1400BEB8A7 /* AppMetricaCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 67C0DCB02E4A8A1400BEB8A7 /* XCRemoteSwiftPackageReference "appmetrica-sdk-ios" */;
+			productName = AppMetricaCore;
+		};
+		67C0DCB52E4A8A1400BEB8A7 /* AppMetricaCrashes */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 67C0DCB02E4A8A1400BEB8A7 /* XCRemoteSwiftPackageReference "appmetrica-sdk-ios" */;
+			productName = AppMetricaCrashes;
+		};
+		67C0DCB72E4A8A1400BEB8A7 /* AppMetricaLibraryAdapter */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 67C0DCB02E4A8A1400BEB8A7 /* XCRemoteSwiftPackageReference "appmetrica-sdk-ios" */;
+			productName = AppMetricaLibraryAdapter;
+		};
+		67C0DCB92E4A8A1400BEB8A7 /* AppMetricaScreenshot */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 67C0DCB02E4A8A1400BEB8A7 /* XCRemoteSwiftPackageReference "appmetrica-sdk-ios" */;
+			productName = AppMetricaScreenshot;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
