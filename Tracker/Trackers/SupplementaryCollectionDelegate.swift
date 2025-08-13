@@ -7,4 +7,6 @@
 
 protocol SupplementaryCollectionDelegate: AnyObject {
     func didUpdateTrackers(isEmpty: Bool)
+    func didRequestEdit(trackerInfo: TrackerInfo)
+    func didRequestDelete(trackerInfo: TrackerInfo)
 }

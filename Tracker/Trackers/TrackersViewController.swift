@@ -50,6 +50,26 @@ final class TrackersViewController: UIViewController {
         
         return view
     }()
+    
+    private lazy var filtersButton: YPButton = {
+        let button = YPButton()
+        button.setTitle(L10n.filtersButtonTitle, for: .normal)
+        button.backgroundColor = .ypBlue
+        button.setTitleColor(.white, for: .normal)
+        button.addTarget(self, action: #selector(filtersTapped), for: .touchUpInside)
+        return button
+    }()
+    
+    private var datePicker = DatePicker
+    
+    private var selectedFilter: Filter {
+        get {
+            UserDefaultsService.shared.selectedFilter
+        }
+        set {
+            UserDefaultsService.shared.selectedFilter = newValue
+        }
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -97,7 +117,6 @@ final class TrackersViewController: UIViewController {
         addButton.translatesAutoresizingMaskIntoConstraints = false
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: addButton)
         
-        let datePicker = DatePicker
         datePicker.addTarget(self, action: #selector(datePickerValueChanged(_:)), for: .valueChanged)
         navigationItem.rightBarButtonItem =  UIBarButtonItem(customView: datePicker)
     }
@@ -142,12 +161,17 @@ final class TrackersViewController: UIViewController {
         collectionView.backgroundColor = .ypWhite
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(collectionView)
+        view.addSubview(filtersButton)
         
         NSLayoutConstraint.activate([
             collectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
             collectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
             collectionView.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 24),
-            collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+            collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            
+            filtersButton.widthAnchor.constraint(equalToConstant: 114),
+            filtersButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            filtersButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16)
         ])
         
         let params = GeometricParams(cellCount: 2,
@@ -163,6 +187,7 @@ final class TrackersViewController: UIViewController {
     private func updateStubVisibility() {
         let hasTrackers = helper?.isEmpty == false
         stubView.isHidden = hasTrackers
+        filtersButton.isHidden = !hasTrackers
     }
     
     @objc private func addTrackerTapped() {
@@ -176,8 +201,24 @@ final class TrackersViewController: UIViewController {
     
     @objc func datePickerValueChanged(_ sender: UIDatePicker) {
         selectedDate = sender.date
+        selectedFilter = .all
         helper?.updateVisibleTrackers(for: selectedDate)
         updateStubVisibility()
+    }
+    
+    @objc func filtersTapped() {
+        let filtersVC = FiltersViewController()
+        filtersVC.onFiltersChanged = { [weak self] filter in
+            guard let self = self else {return}
+            
+            if filter == Filter.today {
+                datePicker.date = Date()
+                selectedDate = datePicker.date
+            }
+            helper?.updateVisibleTrackers(for: selectedDate)
+            updateStubVisibility()
+        }
+        present(filtersVC, animated: true)
     }
 }
 
@@ -200,7 +241,39 @@ extension TrackersViewController: SupplementaryCollectionDelegate {
     func didUpdateTrackers(isEmpty: Bool) {
         stubView.isHidden = !isEmpty
     }
+    
+    func didRequestEdit(trackerInfo: TrackerInfo) {
+        let viewModel = EditTrackerViewModel(
+            trackerInfo: trackerInfo,
+            trackerStore: DataStoreManager.shared.trackerStore
+        )
+        let vc = EditTrackerViewController(type: .habit, viewModel: viewModel)
+        let nav = UINavigationController(rootViewController: vc)
+        
+        nav.navigationBar.setBackgroundImage(UIImage(), for: UIBarMetrics.default)
+        nav.navigationBar.shadowImage = UIImage()
+        
+        present(nav, animated: true)
+    }
+
+    func didRequestDelete(trackerInfo: TrackerInfo) {
+        let viewModel = EditTrackerViewModel(
+            trackerInfo: trackerInfo,
+            trackerStore: DataStoreManager.shared.trackerStore
+        )
+        let alert = UIAlertController(
+            title: nil,
+            message: L10n.deleteTrackerAlertMessage,
+            preferredStyle: .actionSheet
+        )
+        alert.addAction(UIAlertAction(title: L10n.cancelButtonTitle, style: .cancel))
+        alert.addAction(UIAlertAction(title: L10n.deleteButtonTitle, style: .destructive) { _ in
+            viewModel.deleteTracker()
+        })
+        present(alert, animated: true)
+    }
 }
+
 
 extension TrackersViewController: TrackerStoreDelegate {
     func store(_ store: TrackerStore, didUpdate update: TrackerStoreUpdate) {

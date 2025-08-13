@@ -1,35 +1,15 @@
 //
-//  NewTrackerFormView.swift
+//  EditTrackerViewForm.swift
 //  Tracker
 //
-//  Created by Amina Khusnutdinova on 10.07.2025.
+//  Created by Amina Khusnutdinova on 13.08.2025.
 //
 
 import UIKit
 
-enum TrackerType {
-    case habit
-    case event
-}
-
-enum ParameterCellType: CaseIterable {
-    case category
-    case schedule
+final class EditTrackerViewForm: UIView {
+    private let viewModel: EditTrackerViewModel
     
-    var title: String {
-        switch self {
-        case .category: return L10n.categoryTitle
-        case .schedule: return L10n.scheduleTitle
-        }
-    }
-}
-
-enum PickerItem: Int, CaseIterable {
-    case emoji = 0
-    case color
-}
-
-final class NewTrackerFormView: UIView {
     private let type: TrackerType
     private let maxCharacterLimit = 38
     
@@ -47,7 +27,7 @@ final class NewTrackerFormView: UIView {
         }
     }
     
-    weak var delegate: NewTrackerDelegate?
+    weak var delegate: EditTrackerDelegate?
     
     var onFormChanged: (() -> Void)?
     
@@ -67,8 +47,19 @@ final class NewTrackerFormView: UIView {
         selectedDays
     }
     
-    var selectedEmoji: String?
-    var selectedColor: UIColor?
+    var selectedEmoji: String? {
+        didSet {
+            collectionView.reloadData()
+            onFormChanged?()
+        }
+    }
+    
+    var selectedColor: UIColor? {
+        didSet {
+            collectionView.reloadData()
+            onFormChanged?()
+        }
+    }
     
     private let scrollView: UIScrollView = {
         let scroll = UIScrollView()
@@ -91,6 +82,15 @@ final class NewTrackerFormView: UIView {
         stack.alignment = .fill
         stack.translatesAutoresizingMaskIntoConstraints = false
         return stack
+    }()
+    
+    private let quantityLabel: UILabel = {
+        let label = UILabel()
+        label.font = .bold32
+        label.textAlignment = .center
+        label.heightAnchor.constraint(equalToConstant: 70).isActive = true
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
     }()
     
     private let nameTextField = YPPlaceholderTextField()
@@ -141,13 +141,20 @@ final class NewTrackerFormView: UIView {
     private let emojis = String.emojiSet
     private let colors = UIColor.colorSet
     
-    init(type: TrackerType) {
+    init(type: TrackerType, viewModel: EditTrackerViewModel) {
         self.type = type
+        self.viewModel = viewModel
         
         super.init(frame: .zero)
         
+        trackerName = viewModel.trackerInfo.title
+        selectedEmoji = viewModel.trackerInfo.emoji
+        selectedColor = viewModel.trackerInfo.color
+        selectedDays = viewModel.trackerInfo.schedule
+        selectedCategory = viewModel.trackerInfo.category
+
         onFormChanged = { [weak self] in
-            self?.delegate?.updateCreateButtonState()
+            self?.delegate?.updateSaveButtonState()
         }
        
         setupUI()
@@ -164,10 +171,14 @@ final class NewTrackerFormView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func setupUI() {        
+    private func setupUI() {
         backgroundColor = .ypWhite
         
+        quantityLabel.isHidden = type == .event
+        updateQuantityLabel()
+        
         nameTextField.placeholder = L10n.trackerNamePlaceholder
+        nameTextField.text = trackerName
         nameTextField.delegate = self
         nameTextField.addTarget(self, action: #selector(trackerNameChanged), for: .editingChanged)
         
@@ -177,6 +188,7 @@ final class NewTrackerFormView: UIView {
         enableKeyboardDismissOnTap()
         enableKeyboardDismissOnScroll(for: scrollView)
         
+        contentStackView.addArrangedSubview(quantityLabel)
         stackView.addArrangedSubview(nameTextField)
         stackView.addArrangedSubview(errorLabel)
         
@@ -190,7 +202,7 @@ final class NewTrackerFormView: UIView {
             scrollView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
             scrollView.bottomAnchor.constraint(equalTo: bottomAnchor),
 
-            contentStackView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 24),
+            contentStackView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 8),
             contentStackView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
             contentStackView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
             contentStackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
@@ -201,6 +213,13 @@ final class NewTrackerFormView: UIView {
         tableViewHeightConstraint.isActive = true
         collectionViewHeightConstraint = collectionView.heightAnchor.constraint(equalToConstant: 0)
         collectionViewHeightConstraint.isActive = true
+    }
+    
+    private func updateQuantityLabel() {
+        quantityLabel.text = String.localizedStringWithFormat(
+            NSLocalizedString("days_count_text", comment: ""),
+            viewModel.daysCount
+        )
     }
     
     private func setupTableView() {
@@ -236,7 +255,7 @@ final class NewTrackerFormView: UIView {
     }
 }
 
-extension NewTrackerFormView: UITableViewDelegate, UITableViewDataSource {
+extension EditTrackerViewForm: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return tableItems.count
     }
@@ -306,7 +325,7 @@ extension NewTrackerFormView: UITableViewDelegate, UITableViewDataSource {
     }
 }
 
-extension NewTrackerFormView: ScheduleViewControllerDelegate {
+extension EditTrackerViewForm: ScheduleViewControllerDelegate {
     func didSelectDays(_ selectedDays: [WeekDay]) {
         self.selectedDays = selectedDays
     }
@@ -324,7 +343,7 @@ extension NewTrackerFormView: ScheduleViewControllerDelegate {
     }
 }
 
-extension NewTrackerFormView: CategoryViewControllerDelegate {
+extension EditTrackerViewForm: CategoryViewControllerDelegate {
     func didSelectCategory(_ selectedCategory: TrackerCategory) {
         self.selectedCategory = selectedCategory
         if let index = tableItems.firstIndex(of: ParameterCellType.category.title) {
@@ -333,7 +352,7 @@ extension NewTrackerFormView: CategoryViewControllerDelegate {
     }
 }
 
-extension NewTrackerFormView: UITextFieldDelegate {
+extension EditTrackerViewForm: UITextFieldDelegate {
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         guard let currentText = textField.text,
               let textRange = Range(range, in: currentText) else { return true }
@@ -353,7 +372,7 @@ extension NewTrackerFormView: UITextFieldDelegate {
     }
 }
 
-extension NewTrackerFormView: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+extension EditTrackerViewForm: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return PickerItem.allCases.count
     }
@@ -374,15 +393,31 @@ extension NewTrackerFormView: UICollectionViewDataSource, UICollectionViewDelega
         case PickerItem.emoji.rawValue:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: EmojiCell.identifier, for: indexPath) as! EmojiCell
             cell.configure(with: emojis[indexPath.item])
+            setSelectedAppearance(indexPath: indexPath, cell: cell)
             return cell
             
         case PickerItem.color.rawValue:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ColorCell.identifier, for: indexPath) as! ColorCell
             cell.configure(with: colors[indexPath.item])
+            setSelectedAppearance(indexPath: indexPath, cell: cell)
             return cell
             
         default:
             return UICollectionViewCell()
+        }
+    }
+    
+    private func setSelectedAppearance(indexPath: IndexPath, cell: UICollectionViewCell) {
+        if indexPath.section == PickerItem.emoji.rawValue,
+           emojis[indexPath.item] == selectedEmoji {
+            collectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
+            cell.isSelected = true
+        }
+
+        if indexPath.section == PickerItem.color.rawValue,
+           colors[indexPath.item].isEqualToColor(selectedColor ?? .clear) {
+            collectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
+            cell.isSelected = true
         }
     }
     

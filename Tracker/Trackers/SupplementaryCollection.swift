@@ -66,29 +66,50 @@ final class SupplementaryCollection: NSObject {
     }
 
     func updateVisibleTrackers(for date: Date) {
-        currentDate = date
-        guard let currentWeekDay = WeekDay.from(date: date) else { return }
-
-        let completed = recordStore.records
-        
-        categories = categoryStore.categories.map { category in
-            let visibleTrackers = category.trackers.filter { tracker in
-                let isCompletedToday = completed.contains {
-                    $0.trackerId == tracker.id &&
-                    Calendar.current.isDate($0.date, inSameDayAs: date)
-                }
-                if tracker.schedule.isEmpty {
-                    return !completed.contains { $0.trackerId == tracker.id } || isCompletedToday
-                } else {
-                    return tracker.schedule.contains(currentWeekDay)
-                }
-            }
-            return TrackerCategory(title: category.title, trackers: visibleTrackers)
-        }.filter { !$0.trackers.isEmpty }
+        switch UserDefaultsService.shared.selectedFilter {
+        case .completed: categories = filter(completed: true, date: date)
+            break
+        case .incomplete: categories = filter(completed: false, date: date)
+            break
+        default: categories = filterBy(date: date)
+        }
 
         collection.reloadData()
         delegate?.didUpdateTrackers(isEmpty: isEmpty)
     }
+    
+    private func filterBy(date: Date) -> [TrackerCategory] {
+        currentDate = date
+        guard let weekday = WeekDay.from(date: date) else { return [] }
+        
+        return categoryStore.categories.compactMap { category in
+            let trackersForDay = category.trackers.filter { tracker in
+                if tracker.schedule.isEmpty {
+                    return true
+                } else {
+                    return tracker.schedule.contains(weekday)
+                }
+            }
+            return trackersForDay.isEmpty ? nil : TrackerCategory(title: category.title, trackers: trackersForDay)
+        }
+    }
+
+    private func filter(completed: Bool, date: Date) -> [TrackerCategory] {
+        let completedRecords = recordStore.records
+        let allForDate = filterBy(date: date)
+        
+        return allForDate.compactMap { category in
+            let filteredTrackers = category.trackers.filter { tracker in
+                let isCompletedToday = completedRecords.contains {
+                    $0.trackerId == tracker.id &&
+                    Calendar.current.isDate($0.date, inSameDayAs: date)
+                }
+                return completed ? isCompletedToday : !isCompletedToday
+            }
+            return filteredTrackers.isEmpty ? nil : TrackerCategory(title: category.title, trackers: filteredTrackers)
+        }
+    }
+
 }
 
 // MARK: - UICollectionViewDataSource
@@ -162,6 +183,40 @@ extension SupplementaryCollection: UICollectionViewDelegate {
         let title = categories[indexPath.section].title
         headerView.configure(title: title)
         return headerView
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint)
+    -> UIContextMenuConfiguration? {
+        
+        let tracker = categories[indexPath.section].trackers[indexPath.item]
+        let daysCount = recordStore.records.filter { $0.trackerId == tracker.id }.count
+
+        let trackerInfo = TrackerInfo(
+            id: tracker.id,
+            title: tracker.title,
+            color: tracker.color,
+            emoji: tracker.emoji,
+            schedule: tracker.schedule,
+            daysCount: daysCount,
+            category: categories[indexPath.section]
+        )
+        
+        let editAction = UIAction(title: L10n.editButtonTitle) { [weak self] _ in
+            guard let self = self else { return }
+            self.delegate?.didRequestEdit(trackerInfo: trackerInfo)
+        }
+
+        let deleteAction = UIAction(
+            title: L10n.deleteButtonTitle,
+            attributes: .destructive
+        ) { [weak self] _ in
+            guard let self = self else { return }
+            self.delegate?.didRequestDelete(trackerInfo: trackerInfo)
+        }
+        
+        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { _ in
+            UIMenu(title: "", children: [editAction, deleteAction])
+        }
     }
 }
 

@@ -10,14 +10,27 @@ struct StatisticsItem {
     let value: Int
     
     init(type: StatisticsType, value: Int) {
-        title = type.rawValue
+        title = type.title
         self.value = value
     }
 }
 
-enum StatisticsType: String {
-    case bestPeriod = "bestPeriod"
-    case perfectDays = "perfectDays"
-    case completedTrackers = "completedTrackers"
-    case averageAmount = "averageAmount"
+enum StatisticsType {
+    case bestPeriod
+    case perfectDays
+    case completedTrackers
+    case averageAmount
+    
+    var title: String {
+        switch self {
+        case .bestPeriod:
+            return L10n.statisticsBestPeriod
+        case .perfectDays:
+            return L10n.statisticsPerfectDays
+        case .completedTrackers:
+            return L10n.statisticsCompletedTrackers
+        case .averageAmount:
+            return L10n.statisticsAverageAmount
+        }
+    }
 }

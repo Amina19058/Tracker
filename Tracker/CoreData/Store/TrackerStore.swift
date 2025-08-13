@@ -95,6 +95,54 @@ final class TrackerStore: NSObject {
         trackerCoreData.emoji = tracker.emoji
         trackerCoreData.schedule = tracker.schedule as NSArray
     }
+    
+    func category(for trackerId: UUID) throws -> TrackerCategoryCoreData? {
+        let fetchRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "ANY trackers.id == %@", trackerId as CVarArg)
+        fetchRequest.fetchLimit = 1
+        return try context.fetch(fetchRequest).first
+    }
+    
+    func updateTracker(_ tracker: Tracker, in category: TrackerCategoryCoreData) throws {
+        if let trackerCoreData = category.trackers?.first(where: {
+            ($0 as? TrackerCoreData)?.id == tracker.id
+        }) as? TrackerCoreData {
+            update(trackerCoreData, with: tracker)
+            try context.save()
+        }
+    }
+    
+    func deleteTracker(_ trackerId: UUID) throws {
+        let fetchRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "id == %@", trackerId as CVarArg)
+        fetchRequest.fetchLimit = 1
+
+        if let trackerCoreData = try context.fetch(fetchRequest).first {
+            context.delete(trackerCoreData)
+            try context.save()
+        }
+    }
+
+    func moveTracker(_ tracker: Tracker, to newCategory: TrackerCategoryCoreData) throws {
+        if let oldCategory = try category(for: tracker.id),
+           let trackerCoreData = oldCategory.trackers?.first(where: {
+               ($0 as? TrackerCoreData)?.id == tracker.id
+           }) as? TrackerCoreData {
+
+            oldCategory.removeFromTrackers(trackerCoreData)
+
+            update(trackerCoreData, with: tracker)
+
+            newCategory.addToTrackers(trackerCoreData)
+
+            try context.save()
+        } else {
+            let trackerCoreData = TrackerCoreData(context: context)
+            update(trackerCoreData, with: tracker)
+            newCategory.addToTrackers(trackerCoreData)
+            try context.save()
+        }
+    }
 }
 
 extension TrackerStore: NSFetchedResultsControllerDelegate {

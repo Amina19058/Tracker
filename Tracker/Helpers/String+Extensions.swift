@@ -29,3 +29,11 @@ extension String {
         static let stubLabel = "StubLabel"
     }
 }
+
+extension String {
+    static let emojiSet = [
+        "🙂", "😻", "🌺", "🐶", "❤️", "😱",
+        "😇", "😡", "🥶", "🤔", "🙌", "🍔",
+        "🥦", "🏓", "🥇", "🎸", "🏝", "😪",
+    ]
+}

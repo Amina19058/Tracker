@@ -67,3 +67,19 @@
 "friday_short" = "Fri";
 "saturday_short" = "Sat";
 "sunday_short" = "Sun";
+
+"statistics_best_period" = "Best period";
+"statistics_perfect_days" = "Perfect days";
+"statistics_completed_trackers" = "Trackers completed";
+"statistics_average_amount" = "Average value";
+
+"filters_button_title" = "Filters";
+"filters_title" = "Filters";
+"filter_all" = "All trackers";
+"filter_today" = "Trackers for today";
+"filter_completed" = "Completed";
+"filter_incomplete" = "Incomplete";
+
+"edit_tracker_title" = "Tracker editing";
+"save_button_title" = "Save";
+"delete_tracker_alert_message" = "Are you sure you want to delete the tracker?";
