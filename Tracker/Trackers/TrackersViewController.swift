@@ -73,6 +73,9 @@ final class TrackersViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        searchBar.delegate = self
+        
         setupUI()
     }
     
@@ -315,5 +318,16 @@ extension TrackersViewController: CategoryStoreDelegate {
         helper?.updateVisibleTrackers(for: selectedDate)
         updateStubVisibility()
         collectionView.reloadData()
+    }
+}
+
+extension TrackersViewController: UISearchBarDelegate {
+    func searchBar(_ searchBar: UISearchBar, textDidChange text: String) {
+        helper?.updateVisibleTrackers(for: selectedDate, searchText: text)
+        updateStubVisibility()
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
     }
 }

@@ -65,13 +65,22 @@ final class SupplementaryCollection: NSObject {
         collection.reloadData()
     }
 
-    func updateVisibleTrackers(for date: Date) {
+    func updateVisibleTrackers(for date: Date, searchText: String = "") {
         switch UserDefaultsService.shared.selectedFilter {
         case .completed: categories = filter(completed: true, date: date)
             break
         case .incomplete: categories = filter(completed: false, date: date)
             break
         default: categories = filterBy(date: date)
+        }
+        
+        if !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            categories = categories.compactMap { category in
+                let filteredTrackers = category.trackers.filter {
+                    $0.title.range(of: searchText, options: .caseInsensitive) != nil
+                }
+                return filteredTrackers.isEmpty ? nil : TrackerCategory(title: category.title, trackers: filteredTrackers)
+            }
         }
 
         collection.reloadData()
