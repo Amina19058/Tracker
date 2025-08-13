@@ -19,8 +19,8 @@ final class StatisticsViewModel {
     }
     
     init(recordStore: TrackerRecordStore) {
-        self.store = recordStore
-        self.store.delegate = self
+        store = recordStore
+        store.delegate = self
         calculateStatistics()
     }
     
@@ -37,7 +37,7 @@ final class StatisticsViewModel {
         
         let groupedByDate = Dictionary(grouping: allRecords, by: { calendar.startOfDay(for: $0.date) })
         let totalTrackersCount = Set(allRecords.map { $0.trackerId }).count
-        let perfectDaysCount = groupedByDate.values.filter { $0.count == totalTrackersCount }.count
+        let _ = groupedByDate.values.filter { $0.count == totalTrackersCount }.count // perfectDaysCount
         
         let sortedDates = Array(groupedByDate.keys).sorted()
         var bestStreak = 0
@@ -54,14 +54,12 @@ final class StatisticsViewModel {
             bestStreak = max(bestStreak, currentStreak)
             previousDate = date
         }
-        
-        let averageAmount = Double(completedTrackersCount) / Double(groupedByDate.count)
 
         statistics = [
-            StatisticsItem(type: .bestPeriod, value: bestStreak),
-            StatisticsItem(type: .perfectDays, value: perfectDaysCount),
+            StatisticsItem(type: .bestPeriod, value: 0),
+            StatisticsItem(type: .perfectDays, value: 0),
             StatisticsItem(type: .completedTrackers, value: completedTrackersCount),
-            StatisticsItem(type: .averageAmount, value: Int(averageAmount.rounded()))
+            StatisticsItem(type: .averageAmount, value: 0)
         ]
     }
     

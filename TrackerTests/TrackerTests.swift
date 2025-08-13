@@ -11,10 +11,16 @@ import SnapshotTesting
 
 final class TrackerTests: XCTestCase {
 
-    func testEmptyTrackersViewController() {
+    func testTrackersLightScreen() {
         let vc = TrackersViewController()
         
-        assertSnapshot(of: vc, as: .image)
+        assertSnapshot(of: vc, as: .image(traits: .init(userInterfaceStyle: .light)))
+    }
+    
+    func testTrackersDarkScreen() {
+        let vc = TrackersViewController()
+        
+        assertSnapshot(of: vc, as: .image(traits: .init(userInterfaceStyle: .dark)))
     }
 
 }

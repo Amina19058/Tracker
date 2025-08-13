@@ -15,6 +15,7 @@ struct TrackerInfo {
     var schedule: [WeekDay]
     var daysCount: Int
     var category: TrackerCategory
+    let type: TrackerType
 }
 
 final class EditTrackerViewModel {

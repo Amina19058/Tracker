@@ -80,12 +80,17 @@ final class SupplementaryCollection: NSObject {
     
     private func filterBy(date: Date) -> [TrackerCategory] {
         currentDate = date
+        let completed = recordStore.records
         guard let weekday = WeekDay.from(date: date) else { return [] }
         
         return categoryStore.categories.compactMap { category in
             let trackersForDay = category.trackers.filter { tracker in
+                let isCompletedToday = completed.contains {
+                    $0.trackerId == tracker.id &&
+                    Calendar.current.isDate($0.date, inSameDayAs: date)
+                }
                 if tracker.schedule.isEmpty {
-                    return true
+                    return !completed.contains { $0.trackerId == tracker.id } || isCompletedToday
                 } else {
                     return tracker.schedule.contains(weekday)
                 }
@@ -190,7 +195,8 @@ extension SupplementaryCollection: UICollectionViewDelegate {
         
         let tracker = categories[indexPath.section].trackers[indexPath.item]
         let daysCount = recordStore.records.filter { $0.trackerId == tracker.id }.count
-
+        let trackerType: TrackerType = tracker.schedule.isEmpty ? .event : .habit
+        
         let trackerInfo = TrackerInfo(
             id: tracker.id,
             title: tracker.title,
@@ -198,7 +204,8 @@ extension SupplementaryCollection: UICollectionViewDelegate {
             emoji: tracker.emoji,
             schedule: tracker.schedule,
             daysCount: daysCount,
-            category: categories[indexPath.section]
+            category: categories[indexPath.section],
+            type: trackerType
         )
         
         let editAction = UIAction(title: L10n.editButtonTitle) { [weak self] _ in

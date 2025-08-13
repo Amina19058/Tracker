@@ -191,6 +191,12 @@ final class TrackersViewController: UIViewController {
     }
     
     @objc private func addTrackerTapped() {
+        AnalyticsService.shared.report(
+            event: .click,
+            screen: .main,
+            item: .addTrack
+        )
+        
         let createTrackerVC = CreateTrackerViewController()
         createTrackerVC.delegate = self
         
@@ -207,6 +213,12 @@ final class TrackersViewController: UIViewController {
     }
     
     @objc func filtersTapped() {
+        AnalyticsService.shared.report(
+            event: .click,
+            screen: .main,
+            item: .filter
+        )
+        
         let filtersVC = FiltersViewController()
         filtersVC.onFiltersChanged = { [weak self] filter in
             guard let self = self else {return}
@@ -218,7 +230,10 @@ final class TrackersViewController: UIViewController {
             helper?.updateVisibleTrackers(for: selectedDate)
             updateStubVisibility()
         }
-        present(filtersVC, animated: true)
+        
+        let nav = UINavigationController(rootViewController: filtersVC)
+        
+        present(nav, animated: true)
     }
 }
 
@@ -243,11 +258,17 @@ extension TrackersViewController: SupplementaryCollectionDelegate {
     }
     
     func didRequestEdit(trackerInfo: TrackerInfo) {
+        AnalyticsService.shared.report(
+            event: .click,
+            screen: .main,
+            item: .edit
+        )
+        
         let viewModel = EditTrackerViewModel(
             trackerInfo: trackerInfo,
             trackerStore: DataStoreManager.shared.trackerStore
         )
-        let vc = EditTrackerViewController(type: .habit, viewModel: viewModel)
+        let vc = EditTrackerViewController(type: trackerInfo.type, viewModel: viewModel)
         let nav = UINavigationController(rootViewController: vc)
         
         nav.navigationBar.setBackgroundImage(UIImage(), for: UIBarMetrics.default)
@@ -257,6 +278,12 @@ extension TrackersViewController: SupplementaryCollectionDelegate {
     }
 
     func didRequestDelete(trackerInfo: TrackerInfo) {
+        AnalyticsService.shared.report(
+            event: .click,
+            screen: .main,
+            item: .delete
+        )
+        
         let viewModel = EditTrackerViewModel(
             trackerInfo: trackerInfo,
             trackerStore: DataStoreManager.shared.trackerStore

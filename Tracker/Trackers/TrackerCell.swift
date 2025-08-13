@@ -138,6 +138,12 @@ final class TrackerCell: UICollectionViewCell {
     }
     
     @objc private func plusButtonTapped() {
+        AnalyticsService.shared.report(
+            event: .click,
+            screen: .main,
+            item: .track
+        )
+        
         guard let tracker else { return }
         delegate?.didTapTrackerCellButton(for: tracker, in: self)
     }
