@@ -39,6 +39,10 @@ final class SupplementaryCollection: NSObject {
     var isEmpty: Bool {
         return categories.allSatisfy { $0.trackers.isEmpty }
     }
+    
+    var hasAnyTrackers: Bool {
+        return categoryStore.categories.contains { !$0.trackers.isEmpty }
+    }
 
     init(using params: GeometricParams, collection: UICollectionView) {
         self.params = params
@@ -84,7 +88,7 @@ final class SupplementaryCollection: NSObject {
         }
 
         collection.reloadData()
-        delegate?.didUpdateTrackers(isEmpty: isEmpty)
+        delegate?.didUpdateTrackers()
     }
     
     private func filterBy(date: Date) -> [TrackerCategory] {

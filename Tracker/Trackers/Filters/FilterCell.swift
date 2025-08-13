@@ -52,6 +52,6 @@ final class FilterCell: UITableViewCell {
 
     func configure(title: String, isSelected: Bool) {
         titleLabel.text = title
-        checkmarkView.isHidden = !isSelected
+        checkmarkView.isHidden = !isSelected /*|| title == L10n.filterAll*/
     }
 }

@@ -47,7 +47,17 @@ final class TrackersViewController: UIViewController {
             text: L10n.trackersScreenStubText
         ))
         view.translatesAutoresizingMaskIntoConstraints = false
-        
+        view.isHidden = true
+        return view
+    }()
+    
+    private lazy var stubNothingFound: StubView = {
+        let view = StubView(model: StubModel(
+            image: UIImage(resource: .trackersStub),
+            text: L10n.nothingFound
+        ))
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.isHidden = true
         return view
     }()
     
@@ -152,11 +162,14 @@ final class TrackersViewController: UIViewController {
     }
     
     private func setupStub() {
+        view.addSubview(stubNothingFound)
         view.addSubview(stubView)
 
         NSLayoutConstraint.activate([
             stubView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
-            stubView.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 220)
+            stubView.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 220),
+            stubNothingFound.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
+            stubNothingFound.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 220)
         ])
     }
     
@@ -188,9 +201,21 @@ final class TrackersViewController: UIViewController {
     }
     
     private func updateStubVisibility() {
-        let hasTrackers = helper?.isEmpty == false
-        stubView.isHidden = hasTrackers
-        filtersButton.isHidden = !hasTrackers
+        let isEmptyForFilter = helper?.isEmpty ?? false
+        let hasAnyTrackers = helper?.hasAnyTrackers ?? false
+        if !hasAnyTrackers {
+            stubView.isHidden = false
+            stubNothingFound.isHidden = true
+            filtersButton.isHidden = true
+        } else if isEmptyForFilter {
+            stubView.isHidden = true
+            stubNothingFound.isHidden = false
+            filtersButton.isHidden = true
+        } else {
+            stubView.isHidden = true
+            stubNothingFound.isHidden = true
+            filtersButton.isHidden = false
+        }
     }
     
     @objc private func addTrackerTapped() {
@@ -256,8 +281,8 @@ extension TrackersViewController: CreateTrackerViewControllerDelegate {
 }
 
 extension TrackersViewController: SupplementaryCollectionDelegate {
-    func didUpdateTrackers(isEmpty: Bool) {
-        stubView.isHidden = !isEmpty
+    func didUpdateTrackers() {
+        updateStubVisibility()
     }
     
     func didRequestEdit(trackerInfo: TrackerInfo) {

@@ -83,3 +83,5 @@
 "edit_tracker_title" = "Редактирование привычки";
 "save_button_title" = "Сохранить";
 "delete_tracker_alert_message" = "Уверены что хотите удалить трекер?";
+
+"nothing_found" = "Ничего не найдено";
