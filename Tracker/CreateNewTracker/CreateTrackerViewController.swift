@@ -10,17 +10,17 @@ import UIKit
 final class CreateTrackerViewController: UIViewController {
     weak var delegate: CreateTrackerViewControllerDelegate?
 
-    private let titleLabel = YPLabel(with: .Labels.createTrackerTitle)
+    private let titleLabel = YPLabel(with: L10n.createTrackerTitle)
 
     private let habitButton: YPButton = {
         let button = YPButton()
-        button.setTitle(.Labels.habitButtonTitle, for: .normal)
+        button.setTitle(L10n.habitButtonTitle, for: .normal)
         return button
     }()
 
     private let eventButton: YPButton = {
         let button = YPButton()
-        button.setTitle(.Labels.eventButtonTitle, for: .normal)
+        button.setTitle(L10n.eventButtonTitle, for: .normal)
         return button
     }()
 

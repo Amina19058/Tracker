@@ -1,0 +1,87 @@
+/* 
+  Localizable.strings
+  Tracker
+
+  Created by Amina Khusnutdinova on 09.08.2025.
+  
+*/
+
+
+"onboarding_button_title" = "That's technology!";
+"first_onboarding_title" = "Track only what you want";
+"second_onboarding_title" = "Even if it’s not liters of water and yoga";
+
+"trackers_title" = "Trackers";
+"statistics_title" = "Statistics";
+"create_tracker_title" = "Create tracker";
+
+"new_habit_title" = "New habit";
+"new_event_title" = "New irregular event";
+
+"search_field_placeholder" = "Search";
+"trackers_screen_stub_text" = "What will we track?";
+
+"habit_button_title" = "Habit";
+"event_button_title" = "Irregular event";
+
+"tracker_name_placeholder" = "Enter tracker name";
+"tracker_name_limit_error_message" = "Limit of 38 characters";
+"category_button_title" = "Category";
+"schedule_button_title" = "Schedule";
+"create_button_title" = "Create";
+"cancel_button_title" = "Cancel";
+"every_day_schedule_value" = "Every day";
+"emoji_section_title" = "Emoji";
+"color_section_title" = "Color";
+
+"schedule_title" = "Schedule";
+"done_button_title" = "Done";
+
+"category_title" = "Category";
+"add_category_button_title" = "Add category";
+
+"category_screen_stub_text" = "Habits and events can be\ncombined by meaning";
+
+"new_category_title" = "New category";
+"category_name_placeholder" = "Enter category name";
+
+"edit_category_title" = "Edit category";
+"edit_button_title" = "Edit";
+"delete_button_title" = "Delete";
+"delete_category_alert_message" = "Are you sure you don’t need this category?";
+
+"statistics_screen_stub_text" = "There is nothing to analyze yet";
+
+"monday" = "Monday";
+"tuesday" = "Tuesday";
+"wednesday" = "Wednesday";
+"thursday" = "Thursday";
+"friday" = "Friday";
+"saturday" = "Saturday";
+"sunday" = "Sunday";
+
+"monday_short" = "Mon";
+"tuesday_short" = "Tue";
+"wednesday_short" = "Wed";
+"thursday_short" = "Thu";
+"friday_short" = "Fri";
+"saturday_short" = "Sat";
+"sunday_short" = "Sun";
+
+"statistics_best_period" = "Best period";
+"statistics_perfect_days" = "Perfect days";
+"statistics_completed_trackers" = "Trackers completed";
+"statistics_average_amount" = "Average value";
+
+"filters_button_title" = "Filters";
+"filters_title" = "Filters";
+"filter_all" = "All trackers";
+"filter_today" = "Trackers for today";
+"filter_completed" = "Completed";
+"filter_incomplete" = "Incomplete";
+
+"edit_tracker_title" = "Tracker editing";
+"save_button_title" = "Save";
+"delete_tracker_alert_message" = "Are you sure you want to delete the tracker?";
+
+"nothing_found" = "Nothing found";

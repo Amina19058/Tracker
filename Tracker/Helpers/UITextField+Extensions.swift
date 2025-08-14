@@ -18,6 +18,7 @@ final class YPPlaceholderTextField: UITextField {
     }
     
     private func setupUI() {
+        textColor = .ypBlack
         backgroundColor = .ypGrayBackground
         layer.cornerRadius = 16
         font = .regular17

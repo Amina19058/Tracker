@@ -57,13 +57,14 @@ final class CategoryViewController: UIViewController {
     }
     
     private func setupUI() {
-        navigationItem.title = .Labels.categoryTitle
+        navigationItem.title = L10n.categoryTitle
         navigationItem.hidesBackButton = true
         view.backgroundColor = .ypWhite
         
         tableView.delegate = self
         tableView.dataSource = self
         tableView.backgroundColor = .ypWhite
+        tableView.separatorColor = .ypGray
         tableView.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
         tableView.tableHeaderView = UIView(frame: .zero)
         tableView.register(CategoryCell.self, forCellReuseIdentifier: CategoryCell.identifier)
@@ -72,7 +73,7 @@ final class CategoryViewController: UIViewController {
         view.addSubview(tableView)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         
-        addButton.setTitle(.Labels.addCategoryButtonTitle, for: .normal)
+        addButton.setTitle(L10n.addCategoryButtonTitle, for: .normal)
         addButton.addTarget(self, action: #selector(addButtonTapped), for: .touchUpInside)
 
         view.addSubview(addButton)
@@ -101,7 +102,7 @@ final class CategoryViewController: UIViewController {
     private func setupStub() {
         stubView = StubView(model: StubModel(
             image: UIImage(named: .Trackers.starStubImage),
-            text: .Labels.categoryScreenStubText
+            text: L10n.categoryScreenStubText
         ))
         stubView.translatesAutoresizingMaskIntoConstraints = false
         
@@ -164,7 +165,7 @@ extension CategoryViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint)
     -> UIContextMenuConfiguration? {
-        let editAction = UIAction(title: .Labels.editButtonTitle) { [weak self] _ in
+        let editAction = UIAction(title: L10n.editButtonTitle) { [weak self] _ in
             guard let self = self else { return }
             
             let vc = NewCategoryViewController(
@@ -175,7 +176,7 @@ extension CategoryViewController: UITableViewDelegate, UITableViewDataSource {
         }
         
         let deleteAction = UIAction(
-            title: .Labels.deleteButtonTitle,
+            title: L10n.deleteButtonTitle,
             attributes: .destructive
         ) { [weak self] _ in
             guard let self = self else { return }
@@ -190,10 +191,10 @@ extension CategoryViewController: UITableViewDelegate, UITableViewDataSource {
     
     private func showDeleteAlert(for indexPath: IndexPath) {
         let alert = UIAlertController(title: nil,
-                                      message: .Labels.deleteCategoryAlertMessage,
+                                      message: L10n.deleteCategoryAlertMessage,
                                       preferredStyle: .actionSheet)
-        alert.addAction(UIAlertAction(title: .Labels.cancelButtonTitle, style: .cancel))
-        alert.addAction(UIAlertAction(title: .Labels.deleteButtonTitle, style: .destructive, handler: { [weak self] _ in
+        alert.addAction(UIAlertAction(title: L10n.cancelButtonTitle, style: .cancel))
+        alert.addAction(UIAlertAction(title: L10n.deleteButtonTitle, style: .destructive, handler: { [weak self] _ in
             self?.viewModel.deleteCategory(at: indexPath.row)
         }))
         present(alert, animated: true)

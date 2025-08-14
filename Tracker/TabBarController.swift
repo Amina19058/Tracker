@@ -18,25 +18,26 @@ final class TabBarController: UITabBarController, UITabBarControllerDelegate {
         
         tabBar.tintColor = .ypBlue
         tabBar.backgroundColor = .ypWhite
+        tabBar.isTranslucent = false
         tabBar.unselectedItemTintColor = .ypGray
         
         tabBar.layer.borderWidth = 0.5
-        tabBar.layer.borderColor = UIColor.ypGray.cgColor
+        tabBar.layer.borderColor = UIColor.ypGrayBorder.cgColor
         tabBar.clipsToBounds = true
         
         setupTabs()
     }
     
     func showOnboardingIfNeeded() {
-        if !UserDefaults.standard.bool(forKey: "hasSeenOnboarding") {
-            let onboardingVC = OnboardingPageViewController(
-                transitionStyle: .scroll,
-                navigationOrientation: .horizontal,
-                options: nil
-            )
-            onboardingVC.modalPresentationStyle = .fullScreen
-            present(onboardingVC, animated: true)
-        }
+        guard !UserDefaultsService.shared.hasSeenOnboarding else { return }
+
+        let onboardingVC = OnboardingPageViewController(
+            transitionStyle: .scroll,
+            navigationOrientation: .horizontal,
+            options: nil
+        )
+        onboardingVC.modalPresentationStyle = .fullScreen
+        present(onboardingVC, animated: true)
     }
     
     private func setupTabs() {
@@ -61,15 +62,18 @@ final class TabBarController: UITabBarController, UITabBarControllerDelegate {
     }
     
     private func createStatisticsController() -> UIViewController {
-        let statisticsViewController = StatisticsViewController()
+        let store = DataStoreManager.shared.recordStore
+        let statisticsVM = StatisticsViewModel(recordStore: store)
+        
+        let statisticsViewController = StatisticsViewController(viewModel: statisticsVM)
         
         let statisticsBarItem = UITabBarItem(title: tabBarStrings.statisticsTitle,
                                              image: UIImage(named: tabBarStrings.statisticsOffImage),
                                              selectedImage: UIImage(named: tabBarStrings.statisticsOnImage))
         statisticsViewController.tabBarItem = statisticsBarItem
         
-//        let statisticsNavController = UINavigationController(rootViewController: statisticsViewController)
+        let statisticsNavController = UINavigationController(rootViewController: statisticsViewController)
         
-        return statisticsViewController
+        return statisticsNavController
     }
 }

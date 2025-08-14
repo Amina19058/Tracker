@@ -7,7 +7,7 @@
 
 import UIKit
 
-class OnboardingViewController: UIViewController {
+final class OnboardingViewController: UIViewController {
     private lazy var imageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
@@ -19,14 +19,16 @@ class OnboardingViewController: UIViewController {
         label.textAlignment = .center
         label.numberOfLines = 0
         label.font = .bold32
-        label.textColor = .ypBlack
+        label.textColor = .black
         return label
     }()
     
     private lazy var skipButton: YPButton = {
         let button = YPButton()
-        button.setTitle(.Labels.onboardingButtonTitle, for: .normal)
+        button.setTitle(L10n.onboardingButtonTitle, for: .normal)
         button.addTarget(self, action: #selector(skipTapped), for: .touchUpInside)
+        button.backgroundColor = .black
+        button.setTitleColor(.white, for: .normal)
         return button
     }()
     

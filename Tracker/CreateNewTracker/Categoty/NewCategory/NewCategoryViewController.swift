@@ -34,9 +34,9 @@ final class NewCategoryViewController: UIViewController {
         
         switch mode {
         case .create:
-            navigationItem.title = .Labels.newCategoryTitle
+            navigationItem.title = L10n.newCategoryTitle
         case .edit(_, let oldTitle):
-            navigationItem.title = .Labels.editCategoryTitle
+            navigationItem.title = L10n.editCategoryTitle
             nameTextField.text = oldTitle
         }
         
@@ -49,10 +49,10 @@ final class NewCategoryViewController: UIViewController {
     private func setupUI() {
         updateButtonState()
         
-        nameTextField.placeholder = .Labels.categoryNamePlaceholder
+        nameTextField.placeholder = L10n.categoryNamePlaceholder
         nameTextField.addTarget(self, action: #selector(categoryNameChanged), for: .editingChanged)
 
-        doneButton.setTitle(.Labels.doneButtonTitle, for: .normal)
+        doneButton.setTitle(L10n.doneButtonTitle, for: .normal)
         doneButton.addTarget(self, action: #selector(doneTapped), for: .touchUpInside)
         
         view.enableKeyboardDismissOnTap()

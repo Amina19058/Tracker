@@ -7,14 +7,14 @@
 
 import UIKit
 
-class OnboardingPageViewController: UIPageViewController {
+final class OnboardingPageViewController: UIPageViewController {
     lazy var pageControl: UIPageControl = {
         let pageControl = UIPageControl()
         pageControl.numberOfPages = pages.count
         pageControl.currentPage = 0
         
-        pageControl.currentPageIndicatorTintColor = .ypBlack
-        pageControl.pageIndicatorTintColor = .ypBlack.withAlphaComponent(0.3)
+        pageControl.currentPageIndicatorTintColor = .black
+        pageControl.pageIndicatorTintColor = .black.withAlphaComponent(0.3)
         pageControl.translatesAutoresizingMaskIntoConstraints = false
         
         return pageControl
@@ -22,19 +22,19 @@ class OnboardingPageViewController: UIPageViewController {
     
     lazy var pages: [UIViewController] = {
         let skipAction = {
-            UserDefaults.standard.set(true, forKey: "hasSeenOnboarding")
+            UserDefaultsService.shared.hasSeenOnboarding = true
             self.dismiss(animated: true, completion: nil)
         }
         
         let first = OnboardingViewController(
             image: UIImage(resource: .onboarding1),
-            text: .Labels.firstOnboardingTitle,
+            text: L10n.firstOnboardingTitle,
             skipAction: skipAction
         )
         
         let second = OnboardingViewController(
             image: UIImage(resource: .onboarding2),
-            text: .Labels.secondOnboardingTitle,
+            text: L10n.secondOnboardingTitle,
             skipAction: skipAction
         )
         

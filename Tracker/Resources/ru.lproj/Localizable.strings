@@ -1,0 +1,87 @@
+/* 
+  Localizable.strings
+  Tracker
+
+  Created by Amina Khusnutdinova on 09.08.2025.
+  
+*/
+
+
+"onboarding_button_title" = "Вот это технологии!";
+"first_onboarding_title" = "Отслеживайте только то, что хотите";
+"second_onboarding_title" = "Даже если это не литры воды и йога";
+
+"trackers_title" = "Трекеры";
+"statistics_title" = "Статистика";
+"create_tracker_title" = "Создание трекера";
+
+"new_habit_title" = "Новая привычка";
+"new_event_title" = "Новое нерегулярное событие";
+
+"search_field_placeholder" = "Поиск";
+"trackers_screen_stub_text" = "Что будем отслеживать?";
+
+"habit_button_title" = "Привычка";
+"event_button_title" = "Нерегулярное событие";
+
+"tracker_name_placeholder" = "Введите название трекера";
+"tracker_name_limit_error_message" = "Ограничение 38 символов";
+"category_button_title" = "Категория";
+"schedule_button_title" = "Расписание";
+"create_button_title" = "Создать";
+"cancel_button_title" = "Отмена";
+"every_day_schedule_value" = "Каждый день";
+"emoji_section_title" = "Emoji";
+"color_section_title" = "Цвет";
+
+"schedule_title" = "Расписание";
+"done_button_title" = "Готово";
+
+"category_title" = "Категория";
+"add_category_button_title" = "Добавить категорию";
+
+"category_screen_stub_text" = "Привычки и события можно\nобъединить по смыслу";
+
+"new_category_title" = "Новая категория";
+"category_name_placeholder" = "Введите название категории";
+
+"edit_category_title" = "Редактирование категории";
+"edit_button_title" = "Редактировать";
+"delete_button_title" = "Удалить";
+"delete_category_alert_message" = "Эта категория точно не нужна?";
+
+"statistics_screen_stub_text" = "Анализировать пока нечего";
+
+"monday" = "Понедельник";
+"tuesday" = "Вторник";
+"wednesday" = "Среда";
+"thursday" = "Четверг";
+"friday" = "Пятница";
+"saturday" = "Суббота";
+"sunday" = "Воскресенье";
+
+"monday_short" = "Пн";
+"tuesday_short" = "Вт";
+"wednesday_short" = "Ср";
+"thursday_short" = "Чт";
+"friday_short" = "Пт";
+"saturday_short" = "Сб";
+"sunday_short" = "Вс";
+
+"statistics_best_period" = "Лучший период";
+"statistics_perfect_days" = "Идеальные дни";
+"statistics_completed_trackers" = "Трекеров завершено";
+"statistics_average_amount" = "Среднее значение";
+
+"filters_button_title" = "Фильтры";
+"filters_title" = "Фильтры";
+"filter_all" = "Все трекеры";
+"filter_today" = "Трекеры на сегодня";
+"filter_completed" = "Завершенные";
+"filter_incomplete" = "Не завершенные";
+
+"edit_tracker_title" = "Редактирование привычки";
+"save_button_title" = "Сохранить";
+"delete_tracker_alert_message" = "Уверены что хотите удалить трекер?";
+
+"nothing_found" = "Ничего не найдено";
